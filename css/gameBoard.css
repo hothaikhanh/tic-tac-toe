@@ -1,0 +1,123 @@
+.game-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-width: 1300px;
+    height: 100%;
+    min-height: 700px;
+}
+
+.player_display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: clamp(200px, 30%, 40%);
+    min-width: 200px;
+    width: 25%;
+    max-width: 250px;
+    color: var(--font-color);
+    font-family: "VT323", monospace;
+}
+
+.player_title {
+    border-bottom: 2px solid var(--font-color);
+    font-size: 1.5rem;
+}
+
+.player_name {
+    font-size: 4rem;
+}
+
+.player_1 {
+    border-radius: 25px 0px 0px 25px;
+    position: relative;
+    right: -30px;
+}
+
+.player_2 {
+    border-radius: 0px 25px 25px 0px;
+    position: relative;
+    left: -30px;
+}
+
+.game_board {
+    height: clamp(700px, 90%, 900px);
+    z-index: 10;
+    border-radius: 2rem;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 100px;
+}
+
+.score {
+    position: absolute;
+    top: 20px;
+    width: clamp(50%, 50%, 550px);
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.reset {
+    position: absolute;
+    bottom: 20px;
+    font-size: 1.5rem;
+    opacity: 0.3;
+    cursor: pointer;
+}
+
+.reset:hover {
+    opacity: 1;
+}
+
+.score_display {
+    color: var(--font-color);
+    font-size: 2rem;
+    font-family: "VT323", monospace;
+}
+.grid {
+    position: relative;
+    height: 100%;
+    aspect-ratio: 1/1;
+    box-sizing: border-box;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+}
+
+.cell {
+    cursor: pointer;
+    font-family: "VT323", monospace;
+    fill: var(--font-color);
+}
+
+.line-top {
+    border-top: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.line-left {
+    border-left: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.token {
+    font-size: 13rem;
+}
+
+.glass_effect {
+    background: rgba(0, 0, 0, 0.49);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.hide {
+    display: none !important;
+}

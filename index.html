@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <script src="main.js" defer></script>
+
+        <link rel="stylesheet" href="./css/style.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=VT323&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <div class="title">Tic Tac Toe</div>
+        <div class="start-menu">
+            <button id="PVE">Single Player</button>
+            <button id="PVP">Multiplayer</button>
+        </div>
+
+        <div class="player-menu glass_effect">
+            <div class="singlePlayer hide">
+            
+            </div>
+
+            <div class="multiPlayer">
+                <div class="player_section">
+                    <h2 >Player One</h2>
+                    <h3 for="p1_name">Please enter your name</h3>
+                    <input type="text" name="p1_name" id="" maxlength="10"/>
+
+                    <h3 for="p1_token">Please select your icon</h3>
+                    <div class="token_container">
+                        
+                        <label for="" class="token_option">
+                            <input type="radio" name="" id="">
+                            <span class="token_icon"></span></label>
+                        <label for="" class="token_option">
+                            <input type="radio" name="" id="">
+                            <span class="token_icon"></span></label>
+                        <label for="" class="token_option">
+                            <input type="radio" name="" id="">
+                            <span class="token_icon"></span></label>
+                    </div>
+                </div>
+
+                <div class="versus">&lt;VS&gt;</div>
+
+                <div class="player_section">
+                    <h2 >Player Two</h2>
+                    <h3 >Please enter your name</h3>
+                    <input type="text" name="p2_name" id="" maxlength="10"/>
+
+                    <h3 >Please select your icon</h3>
+                    <div class="token_container">
+                        <label for="" class="token_option">
+                            <input type="radio" name="" id="">
+                            <span class="token_icon"></span></label>
+                        <label for="" class="token_option">
+                            <input type="radio" name="" id="">
+                            <span class="token_icon"></span></label>
+                        <label for="" class="token_option">
+                            <input type="radio" name="" id="">
+                            <span class="token_icon"></span></label>
+                    </div>
+                </div>
+            </div>
+            <button>Start Game</button>
+            </div>
+        </body>
+
+        <div class="game-container hide">
+            <div class="player_display player_1 glass_effect">
+                <p class="player_title">Player 1</p>
+                <div class="player_name">Andy</div>
+            </div>
+            <div class="game_board glass_effect">
+                <div class="score">
+                    <div class="score_display">x</div>
+                    <div class="score_display">x</div>
+                    <div class="score_display">o</div>
+                    <div class="score_display">o</div>
+                    <div class="score_display">x</div>
+                </div>
+                <div class="grid">
+                    <div class="cell">
+                        <svg height="100%" width="100%">
+                            <text x="30%" y="70%" class="token">x</text>
+                        </svg>
+                    </div>
+                    <div class="cell line-left">
+                        <svg height="100%" width="100%">
+                            <text x="30%" y="70%" class="token">o</text>
+                        </svg>
+                    </div>
+                    <div class="cell line-left"></div>
+                    <div class="cell line-top"></div>
+                    <div class="cell line-left line-top"></div>
+                    <div class="cell line-left line-top"></div>
+                    <div class="cell line-top"></div>
+                    <div class="cell line-left line-top"></div>
+                    <div class="cell line-left line-top"></div>
+                </div>
+                <div class="reset">RESET</div>
+            </div>
+            <div class="player_display player_2 glass_effect">
+                <p class="player_title">Bot Easy</p>
+                <div class="player_name">Sam</div>
+            </div>
+        </div>
+    </body>
+</html>

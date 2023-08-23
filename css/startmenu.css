@@ -1,0 +1,32 @@
+.start-menu {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    top: 60%;
+}
+
+.start-menu button {
+    font-size: 2.5rem;
+    cursor: pointer;
+    display: block;
+    background-color: inherit;
+    border: none;
+    color: inherit;
+    font-family: "VT323", monospace;
+    margin-bottom: 20px;
+}
+
+.start-menu button:hover {
+    color: white;
+}
+
+.start-menu button:hover::before {
+    display: inline;
+}
+
+.start-menu button::before {
+    content: "> ";
+    display: none;
+}

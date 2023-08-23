@@ -1,0 +1,56 @@
+:root {
+    --primamry-color: red;
+    --secondary-color: blue;
+    --background-color: #1b1b1b;
+    --background-font-color: #acacac;
+    --font-color: white;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
+
+html,
+body {
+    height: 100%;
+    font-family: "VT323", monospace;
+    color: var(--font-color);
+    background-color: var(--background-color);
+    color: var(--background-font-color);
+    font-family: "VT323", monospace;
+
+    width: 100%;
+    min-width: 1300px;
+    height: 100%;
+    min-height: 700px;
+    position: absolute;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: -999;
+}
+
+.title {
+    z-index: -1;
+    position: absolute;
+    text-align: center;
+    font-size: 30vh;
+    transform: translateY(-20%);
+    transition: transform 0.5s ease-out;
+}
+
+input[type="text"]:focus {
+    outline: none;
+}
+
+button {
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--font-color);
+    font-family: "VT323", monospace;
+    border: none;
+    cursor: pointer;
+    font-size: 2rem;
+}

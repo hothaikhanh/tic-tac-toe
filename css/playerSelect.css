@@ -1,0 +1,64 @@
+.player-menu {
+    border-radius: 25px;
+    width: clamp(700px, 50%, 1000px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 40px;
+    color: var(--font-color);
+}
+.singlePlayer {
+    /* todo */
+}
+
+.multiPlayer {
+    display: flex;
+    align-items: center;
+}
+
+.multiPlayer .versus {
+    font-size: 4rem;
+}
+
+.multiPlayer .player_section {
+    min-width: 400px;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.multiPlayer h2 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+}
+
+.multiPlayer h3 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+.multiPlayer input[type="text"] {
+    width: clamp(200px, 30%, 40%);
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+    color: var(--font-color);
+    font-family: "VT323", monospace;
+    font-size: 2.5rem;
+    text-align: center;
+    border-bottom: 2px solid var(--font-color);
+    margin-bottom: 40px;
+}
+
+.multiPlayer .token_container {
+    margin-bottom: 40px;
+}
+
+.multiPlayer input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
