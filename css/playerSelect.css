@@ -1,13 +1,19 @@
 .player-menu {
     border-radius: 25px;
-    width: clamp(700px, 50%, 1000px);
-    display: flex;
+    width: clamp(900px, 50%, 1000px);
     align-items: center;
+    display: none;
     justify-content: center;
     flex-direction: column;
     padding: 40px;
     color: var(--font-color);
 }
+
+.player-menu.active {
+    animation: floatIn 0.8s forwards ease-in;
+    display: flex;
+}
+
 .singlePlayer {
     /* todo */
 }
@@ -51,14 +57,44 @@
     margin-bottom: 40px;
 }
 
-.multiPlayer .token_container {
+.token_container {
     margin-bottom: 40px;
+    display: flex;
+    gap: 20px;
 }
 
 .multiPlayer input[type="radio"] {
     position: absolute;
-    opacity: 0;
     cursor: pointer;
+
+    opacity: 0;
     height: 0;
     width: 0;
+}
+
+.token_icon {
+    border: 2px solid var(--font-color);
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.5;
+    cursor: pointer;
+}
+.token_icon path {
+    fill: var(--font-color);
+}
+
+.token_icon:hover {
+    opacity: 1;
+}
+
+input:checked ~ .token_icon {
+    background-color: var(--font-color);
+    opacity: 1;
+}
+
+input:checked ~ .token_icon path {
+    fill: black;
 }

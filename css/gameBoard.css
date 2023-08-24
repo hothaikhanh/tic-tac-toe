@@ -1,12 +1,17 @@
 .game-container {
     position: relative;
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
     width: 100%;
     min-width: 1300px;
     height: 100%;
     min-height: 700px;
+}
+
+.game-container.active {
+    animation: floatIn 0.8s forwards ease-in;
+    display: flex;
 }
 
 .player_display {
