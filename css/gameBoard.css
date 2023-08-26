@@ -1,4 +1,4 @@
-.game-container {
+.game {
     position: relative;
     display: none;
     justify-content: center;
@@ -9,12 +9,12 @@
     min-height: 700px;
 }
 
-.game-container.active {
-    animation: floatIn 0.8s forwards ease-in;
+.game.active {
+    animation: floatIn 0.8s forwards ease-in-out;
     display: flex;
 }
 
-.player_display {
+.player_info {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -25,6 +25,17 @@
     max-width: 250px;
     color: var(--font-color);
     font-family: "VT323", monospace;
+    position: relative;
+}
+
+.player_info.left {
+    border-radius: 25px 0px 0px 25px;
+    right: -2px;
+}
+
+.player_info.right {
+    border-radius: 0px 25px 25px 0px;
+    left: -2px;
 }
 
 .player_title {
@@ -36,19 +47,7 @@
     font-size: 4rem;
 }
 
-.player_1 {
-    border-radius: 25px 0px 0px 25px;
-    position: relative;
-    right: -30px;
-}
-
-.player_2 {
-    border-radius: 0px 25px 25px 0px;
-    position: relative;
-    left: -30px;
-}
-
-.game_board {
+.board {
     height: clamp(700px, 90%, 900px);
     z-index: 10;
     border-radius: 2rem;
@@ -113,14 +112,6 @@
 
 .token {
     font-size: 13rem;
-}
-
-.glass_effect {
-    background: rgba(0, 0, 0, 0.49);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
 }
 
 .hide {

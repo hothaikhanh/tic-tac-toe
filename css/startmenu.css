@@ -7,6 +7,10 @@
     top: 60%;
 }
 
+.start-menu.inactive {
+    display: none;
+}
+
 .start-menu button {
     font-size: 2.5rem;
     cursor: pointer;

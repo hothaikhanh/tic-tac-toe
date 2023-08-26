@@ -1,4 +1,4 @@
-const gameBoard = function () {
+function board() {
     const board = [];
     const columns = 3;
     const rows = 3;
@@ -14,7 +14,7 @@ const gameBoard = function () {
     };
 
     return { setBoard, getBoard };
-};
+}
 
 function cell() {
     let value = 0;
@@ -47,21 +47,29 @@ function player() {
     return { getToken, getName, setName, setToken };
 }
 
-function playersController() {
-    const player1 = player();
-    const player2 = player();
+function players() {
+    const players = Array.from(Array(2)).fill(player());
 
-    const getPlayer = (playerName) => {
-        return playerName === "player1" ? player1 : player2;
+    const getPlayer = () => {
+        return players;
     };
 
-    return { getPlayer };
+    const setPlayer = (index, attribute, value) => {
+        if (attribute == "token") {
+            players[index].setToken(value);
+            return;
+        }
+        if (attribute == "name") {
+            players[index].setName(value);
+            return;
+        }
+    };
+
+    return { getPlayer, setPlayer };
 }
 
-const getPlayer = () => {};
-
 function gameController() {
-    // const board = gameBoard();
+    // const _board = board();
     // const
     // let activePlayer = ;
     // const switchPlayer = () => {
@@ -71,106 +79,92 @@ function gameController() {
     // return { switchPlayer, getActivePlayer };
 }
 
-const gameMode = () => {
-    const startMenu = document.querySelector(".start-menu");
-    const title = document.querySelector(".title");
-
+function gameMode() {
     let gameMode = "";
     const set = (mode) => {
         gameMode = mode;
-        startMenu.classList.add("hide");
-        title.style.transform = "none";
     };
 
     const get = () => gameMode;
     return { set, get };
-};
+}
 
-const startMenu = (function () {
-    const _GameMode = gameMode();
-
+function transition() {
+    const _players = players();
+    const title = document.querySelector(".title");
+    const startMenu = document.querySelector(".start-menu");
     const playerMenu = document.querySelector(".player-menu");
-    const pvpOption = document.querySelector("#PVP");
-    const pveOption = document.querySelector("#PVE");
+    const game = document.querySelector(".game");
 
-    pvpOption.addEventListener("click", () => {
-        _GameMode.set("pvp");
+    const nameDisplays = document.querySelectorAll(".player_name");
+    const titleDisplays = document.querySelectorAll(".player_title");
+
+    const toPlayer = () => {
+        title.classList.add("center");
+        startMenu.classList.add("inactive");
         playerMenu.classList.add("active");
-    });
-    pveOption.addEventListener("click", () => {
-        _GameMode.set("pve");
-        playerMenu.classList.add("active");
-    });
+    };
+    const toGame = () => {
+        playerMenu.classList.add("inactive");
+        setTimeout(() => {
+            playerMenu.classList.remove("active");
+        }, 500);
+        game.classList.add("active");
+
+        console.log(_players.getPlayer()[0].getToken());
+
+        console.log("...starting the game");
+    };
+
+    return { toPlayer, toGame };
+}
+
+const startMenuEventHandler = (function () {
+    const _gameMode = gameMode();
+    const _transit = transition();
+
+    const gameModeOpts = document.querySelectorAll(".start-menu > button");
+
+    for (let btn of gameModeOpts) {
+        btn.addEventListener("click", (e) => {
+            e.target === gameModeOpts[0] ? _gameMode.set("pve") : _gameMode.set("pvp");
+            _transit.toPlayer();
+        });
+    }
 })();
 
-const chosenToken = () => {
-    const p1_token_inputs = document.querySelectorAll('[name="p1_token"]');
-    const p2_token_inputs = document.querySelectorAll('[name="p2_token"]');
-
-    const getP1Token = () => {
-        for (let input of p1_token_inputs) {
-            if (input.checked) return input.attributes.tokenID;
-        }
-    };
-
-    const getP2Token = () => {
-        for (let input of p2_token_inputs) {
-            if (input.checked) return input.attributes.tokenID;
-        }
-    };
-
-    return { getP1Token, getP2Token };
-};
-
-const multiPlayerMenu = (function () {
-    const _players = playersController();
-    const _chosenToken = chosenToken();
-
-    const p1 = _players.getPlayer("player1");
-    const p2 = _players.getPlayer("player2");
-
-    const p1_name_input = document.querySelector("#p1_name");
-    const p2_name_input = document.querySelector("#p2_name");
+const multiPlayerMenuEventHandler = (function () {
+    const _players = players();
+    const _transit = transition();
 
     const submitBtn = document.querySelector("#multiPlayerSubmit");
 
     submitBtn.addEventListener("click", () => {
-        if (p1_name_input.value == "" || p2_name_input.value == "") {
-            //todo
+        for (let i = 0; i < _players.getPlayer().length; i++) {
+            let nameValue = document.querySelectorAll(".name_input")[i].value;
+            let tokenValue = document.querySelector('input[playerID="' + i + '"]:checked').attributes.tokenID;
+
+            _players.setPlayer(i, "name", nameValue);
+            _players.setPlayer(i, "token", tokenValue);
+            console.log(_players.getPlayer()[i].getToken());
         }
-
-        p1.setName(p1_name_input.value);
-        p2.setName(p2_name_input.value);
-        p1.setToken(_chosenToken.getP1Token());
-        p2.setToken(_chosenToken.getP2Token());
-
-        console.log("...starting the game");
-
-        startGame();
+        _transit.toGame();
     });
 })();
 
-const startGame = function () {
-    const playerMenu = document.querySelector(".player-menu");
-    const gameBoard = document.querySelector(".game-container");
-    playerMenu.classList.add("active");
-    gameBoard.classList.add("active");
-};
-
-function gameHandler() {
-    const board = gameBoard();
-    const game = gameController();
+const gameEventHandler = (function () {
+    const _board = board();
+    const _gameController = gameController();
     const cells = document.querySelectorAll(".cell");
 
     //add event for each cell on the board
-    const cellEventHandler = () => {
-        for (let x = 0, i = 0; x < board.rows; x++) {
-            for (let y = 0; y < board.columns; y++) {
-                cells[i].addEventListener("click", () => {
-                    board[x][y].setToken(game.getActivePlayer().getToken());
-                });
-                i += 1;
-            }
+
+    for (let x = 0, i = 0; x < board.rows; x++) {
+        for (let y = 0; y < board.columns; y++) {
+            cells[i].addEventListener("click", () => {
+                board[x][y].setToken(_gameController.getActivePlayer().getToken());
+            });
+            i += 1;
         }
-    };
-}
+    }
+})();

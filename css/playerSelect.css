@@ -1,4 +1,5 @@
 .player-menu {
+    position: absolute;
     border-radius: 25px;
     width: clamp(900px, 50%, 1000px);
     align-items: center;
@@ -10,8 +11,12 @@
 }
 
 .player-menu.active {
-    animation: floatIn 0.8s forwards ease-in;
+    animation: floatIn 0.5s forwards ease-in;
     display: flex;
+}
+
+.player-menu.inactive {
+    animation: floatOut 0.5s forwards ease-in;
 }
 
 .singlePlayer {
