@@ -48,6 +48,7 @@
 }
 
 .board {
+    position: relative;
     height: clamp(700px, 90%, 900px);
     z-index: 10;
     border-radius: 2rem;

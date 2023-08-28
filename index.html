@@ -35,7 +35,7 @@
                     <h3>Please select your icon</h3>
                     <div class="token_container">
                         <label for="p1_token_1">
-                            <input type="radio" name="p1_token" playerID="0" tokenID="cross" />
+                            <input type="radio" name="p1_token" id="p1_token_1" playerID="0" tokenID="cross" />
                             <span class="token_icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 0 384 512">
                                     <path
@@ -45,7 +45,7 @@
                             </span>
                         </label>
                         <label for="p1_token_2">
-                            <input type="radio" name="p1_token" playerID="0" tokenID="star" />
+                            <input type="radio" name="p1_token" id="p1_token_2" playerID="0" tokenID="star" />
                             <span class="token_icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 0 576 512">
                                     <path
@@ -55,7 +55,7 @@
                             </span>
                         </label>
                         <label for="p1_token_3">
-                            <input type="radio" name="p1_token" playerID="0" tokenID="bolt" />
+                            <input type="radio" name="p1_token" id="p1_token_3" playerID="0" tokenID="bolt" />
                             <span class="token_icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 0 448 512">
                                     <path
@@ -77,7 +77,7 @@
                     <h3>Please select your icon</h3>
                     <div class="token_container">
                         <label for="p2_token_1">
-                            <input type="radio" name="p2_token" playerId="1" tokenId="circle" />
+                            <input type="radio" name="p2_token" id="p2_token_1" playerId="1" tokenId="circle" />
                             <span class="token_icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 0 512 512">
                                     <path
@@ -86,7 +86,7 @@
                                 </svg> </span
                         ></label>
                         <label for="p2_token_2">
-                            <input type="radio" name="p2_token" playerId="1" tokenId="heart" />
+                            <input type="radio" name="p2_token" id="p2_token_2" playerId="1" tokenId="heart" />
                             <span class="token_icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 0 512 512">
                                     <path
@@ -95,7 +95,7 @@
                                 </svg> </span
                         ></label>
                         <label for="p2_token_3">
-                            <input type="radio" name="p2_token" playerId="1" tokenId="flame" />
+                            <input type="radio" name="p2_token" id="p2_token_3" playerId="1" tokenId="flame" />
                             <span class="token_icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" height="2em" viewBox="0 0 384 512">
                                     <path
@@ -123,15 +123,15 @@
                     <div class="score_display"></div>
                 </div>
                 <div class="grid">
-                    <div class="cell"></div>
-                    <div class="cell line-left"></div>
-                    <div class="cell line-left"></div>
-                    <div class="cell line-top"></div>
-                    <div class="cell line-left line-top"></div>
-                    <div class="cell line-left line-top"></div>
-                    <div class="cell line-top"></div>
-                    <div class="cell line-left line-top"></div>
-                    <div class="cell line-left line-top"></div>
+                    <div x="0" y="0" class="cell"></div>
+                    <div x="0" y="1" class="cell line-left"></div>
+                    <div x="0" y="2" class="cell line-left"></div>
+                    <div x="1" y="0" class="cell line-top"></div>
+                    <div x="1" y="1" class="cell line-left line-top"></div>
+                    <div x="1" y="2" class="cell line-left line-top"></div>
+                    <div x="2" y="0" class="cell line-top"></div>
+                    <div x="2" y="1" class="cell line-left line-top"></div>
+                    <div x="2" y="2" class="cell line-left line-top"></div>
                 </div>
                 <div class="reset">RESET</div>
             </div>
