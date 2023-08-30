@@ -29,12 +29,11 @@ function Board() {
                 board[i].push(Cell());
             }
         }
-        console.log(board);
     };
     const getBoard = () => board;
 
     const markCell = (x, y, tokenID) => {
-        if (board[x][y].getVal() == "") board[x][y].setVal(tokenID);
+        board[x][y].setVal(tokenID);
     };
 
     return { getColumn, getRow, getBoard, setBoard, markCell };
@@ -73,63 +72,111 @@ function GameController() {
     };
     const getGameMode = () => gameMode;
     const getPlayers = () => players;
-
-    const setNewBoard = () => {
-        board.setBoard();
-    };
+    const setNewBoard = () => board.setBoard();
 
     let winCondition = 3;
 
-    const check = (x, y, tokenID) => {
+    const checkWin = (x, y, tokenID) => {
         let _board = board.getBoard();
         let _row = board.getRow();
         let _col = board.getColumn();
-        let x_row = 0;
-        let y_row = 0;
-        let z_row = 0;
 
+        let hori_result = [_board[x][y]];
+        let vert_result = [_board[x][y]];
+        let diag_result_1 = [_board[x][y]];
+        let diag_result_2 = [_board[x][y]];
+        console.log(`Cheking the area around cell [${x},${y}]`);
         for (let i = 1; i < winCondition; i++) {
-            if (x + i < _row && _board[x + i][y].getToken !== tokenID) break;
-            x_row++;
-        }
-        for (let i = 1; i < winCondition; i++) {
-            if (x - i >= 0 && _board[x - i][y].getToken !== tokenID) break;
-            x_row++;
+            let vert = [x - i >= 0, x + i < _row];
+            let hori = [y - i >= 0, y + i < _col];
+            let diag_1 = [hori[0] && vert[0], hori[1] && vert[1]];
+            let diag_2 = [hori[1] && vert[0], hori[0] && vert[1]];
+
+            // console.log(`Loop ${i}:
+            // | ${diag_1[0]} | ${vert[0]} | ${diag_2[0]} |
+            // | ${hori[0]} |      | ${hori[1]} |
+            // | ${diag_2[1]} | ${vert[1]} | ${diag_1[1]} |`);
+
+            // console.log("check vertical");
+            if (vert[1] && _board[x + i][y].getVal() == tokenID) vert_result.push(_board[x + i][y]);
+            if (vert[0] && _board[x - i][y].getVal() == tokenID) vert_result.unshift(_board[x - i][y]);
+
+            // console.log("check horizontal");
+            if (hori[1] && _board[x][y + i].getVal() == tokenID) hori_result.push(_board[x][y + i]);
+            if (hori[0] && _board[x][y - i].getVal() == tokenID) hori_result.unshift(_board[x][y - i]);
+
+            // console.log("check diagonal_1");
+            if (diag_1[0] && _board[x - i][y - i].getVal() == tokenID) diag_result_1.unshift(_board[x - i][y - i]);
+            if (diag_1[1] && _board[x + i][y + i].getVal() == tokenID) diag_result_1.push(_board[x + i][y + i]);
+
+            // console.log("check diagonal_2");
+            if (diag_2[0] && _board[x - i][y + i].getVal() == tokenID) diag_result_2.unshift(_board[x - i][y + i]);
+            if (diag_2[1] && _board[x + i][y - i].getVal() == tokenID) diag_result_2.push(_board[x + i][y - i]);
         }
 
-        for (let i = 1; i < winCondition; i++) {
-            if (y + i < _col && _board[x][y + i].getToken !== tokenID) break;
-            y_row++;
-        }
-        for (let i = 1; i < winCondition; i++) {
-            if (y - i >= 0 && _board[x][y - i].getToken !== tokenID) break;
-            y_row++;
-        }
-
-        for (let i = 1; i < winCondition; i++) {
-            if (x + i < _row && y + i < _col && _board[x + i][y + i].getToken !== tokenID) break;
-            z_row++;
-        }
-        for (let i = 1; i < winCondition; i++) {
-            if (x - i >= 0 && y - i >= 0 && _board[x - i][y - i].getToken !== tokenID) break;
-            z_row++;
-        }
-
-        console.log(x_row, y_row, z_row);
-        if (x_row >= winCondition || y_row >= winCondition || z_row >= winCondition) return true;
+        console.log(`Player ${getActivePlayer().getName()} results: 
+            Horizontal: ${hori_result.length}
+            Vertical: ${vert_result.length}
+            Diagonal_1: ${diag_result_1.length}
+            Diagonal_2: ${diag_result_2.length}`);
+        if (
+            hori_result.length >= winCondition ||
+            vert_result.length >= winCondition ||
+            diag_result_1.length >= winCondition ||
+            diag_result_2.length >= winCondition
+        )
+            return true;
         return false;
     };
+    const checkDraw = () => {
+        for (let x = 0; x < board.getRow(); x++) {
+            for (let y = 0; y < board.getColumn(); y++) {
+                if (board.getBoard()[x][y].getVal() == "") return false;
+            }
+        }
+        return true;
+    };
+    const play = (x, y) => {
+        if (board.getBoard()[x][y].getVal() != "") return;
 
-    const play = (row, column) => {
-        board.markCell(row, column, getActivePlayer().getToken());
+        board.markCell(x, y, getActivePlayer().getToken());
 
-        if (check(row, column, getActivePlayer().getToken())) {
-            console.log("yep");
+        if (checkWin(x, y, getActivePlayer().getToken())) {
+            getWinner();
+            switchPlayer();
+            return;
+        }
+
+        if (checkDraw()) {
+            console.log("it's a draw");
+            switchPlayer();
+            return;
         }
         switchPlayer();
     };
 
-    return { setNewBoard, getGameMode, setGameMode, getActivePlayer, getPlayers, play, getBoard: board.getBoard };
+    const getWinner = () => {
+        console.log(`${getActivePlayer().getName()} won the game`);
+    };
+
+    const newRound = () => {};
+    const forfeitRound = (playerID) => {
+        activePlayer = players[playerID] == players[0] ? players[1] : players[0];
+        getWinner();
+        newRound();
+    };
+    const resetGame = () => {};
+
+    return {
+        setNewBoard,
+        getGameMode,
+        setGameMode,
+        getActivePlayer,
+        getPlayers,
+        forfeitRound,
+        play,
+        getBoard: board.getBoard,
+    };
 }
 
 function ScreenController() {
@@ -208,20 +255,48 @@ function ScreenController() {
 
     const multiPlayerMenuEventHandler = (function () {
         const submitBtn = document.querySelector("#multiPlayerSubmit");
+        const submitCondition = [true, true];
 
         submitBtn.addEventListener("click", () => {
             for (let i = 0; i < game.getPlayers().length; i++) {
+                console.log("checking: " + i);
                 let nameValue = document.querySelectorAll(".name_input")[i].value;
-                let tokenValue = document.querySelector('input[playerID="' + i + '"]:checked').attributes.tokenID;
+                let tokenValue = "";
+                let selectedToken = document.querySelector('input[playerID="' + i + '"]:checked');
+                if (selectedToken !== null) {
+                    tokenValue = selectedToken.attributes.tokenID;
+                }
+                let nameAlert = "Plese enter your name";
+                let tokenAlert = "Plese pick your player icon";
 
-                game.getPlayers()[i].setName(nameValue);
-                game.getPlayers()[i].setToken(tokenValue);
+                let alertContainer = document.querySelectorAll(".player-menu .alert")[i];
 
-                console.log(game.getPlayers()[i].getName());
-                console.log(game.getPlayers()[i].getToken());
+                if (nameValue == "") {
+                    alertContainer.children[0].innerText = nameAlert;
+                } else {
+                    alertContainer.children[0].innerText = "";
+                    game.getPlayers()[i].setName(nameValue);
+                }
+
+                if (tokenValue == "") {
+                    alertContainer.children[1].innerText = tokenAlert;
+                } else {
+                    alertContainer.children[1].innerText = "";
+                    game.getPlayers()[i].setToken(tokenValue);
+                }
+
+                submitCondition[i] = nameValue !== "" && tokenValue !== "";
+
+                // console.log(game.getPlayers()[i].getName());
+                // console.log(game.getPlayers()[i].getToken());
             }
-            transition().toGame();
-            transition().nextRound();
+
+            console.log(submitCondition.toString());
+
+            if (submitCondition.toString() == "true,true") {
+                transition().toGame();
+                transition().nextRound();
+            }
         });
     })();
 
@@ -234,6 +309,13 @@ function ScreenController() {
                     updateCell(x, y);
                 });
             }
+        }
+
+        const ffBtns = document.querySelectorAll(".ff");
+        for (let playerID = 0; playerID < ffBtns.length; playerID++) {
+            ffBtns[playerID].addEventListener("click", () => {
+                game.forfeitRound(playerID);
+            });
         }
     })();
 
