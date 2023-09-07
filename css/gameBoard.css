@@ -14,6 +14,10 @@
     display: flex;
 }
 
+.game.inactive {
+    animation: floatOut 0.5s forwards ease-in-out;
+}
+
 .player_info {
     display: flex;
     justify-content: center;
@@ -26,7 +30,6 @@
     color: var(--font-color);
     font-family: "VT323", monospace;
     position: relative;
-    overflow: hidden;
 }
 
 .player_info.left {
@@ -46,6 +49,15 @@
 
 .player_name {
     font-size: 4rem;
+}
+
+.player_token {
+    box-sizing: border-box;
+    padding: 10%;
+    position: absolute;
+    opacity: 0.05;
+    fill: var(--font-color);
+    z-index: -1;
 }
 
 .board {
@@ -73,8 +85,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
+    padding: 10px;
     color: var(--font-color);
+    fill: var(--font-color);
+
     font-size: 2rem;
     font-family: "VT323", monospace;
     width: 2.5rem;
@@ -118,9 +132,56 @@
     cursor: pointer;
 }
 
+.left .ff {
+    border-radius: 25px 0px 0px 25px;
+}
+
+.right .ff {
+    border-radius: 0px 25px 25px 0px;
+}
+
+.turn-indicator {
+    fill: var(--font-color);
+    width: 25%;
+    position: absolute;
+    top: -55px;
+    font-size: 1.5rem;
+    white-space: nowrap;
+    display: none;
+    justify-content: center;
+}
+
+.turn-indicator span {
+    position: absolute;
+    bottom: 75px;
+}
+.turn-indicator.active {
+    display: flex;
+}
+
+.left .turn-indicator.active {
+    animation: floatInRight 0.3s ease-out forwards;
+}
+
+.right .turn-indicator.active {
+    animation: floatInLeft 0.3s ease-out forwards;
+}
+
+.left .turn-indicator.inactive {
+    animation: floatOutRight 0.3s ease-in forwards;
+}
+
+.right .turn-indicator.inactive {
+    animation: floatOutLeft 0.3s ease-in forwards;
+}
+
 .player_info:hover .ff {
     display: flex;
     animation: fadeIn 0.4s ease-in forwards;
+}
+
+.player_info:hover .turn-indicator {
+    animation: fadeOut 0.4s ease-in forwards;
 }
 
 .grid {
@@ -130,14 +191,18 @@
     box-sizing: border-box;
 
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(150px, 1fr));
+    grid-template-rows: repeat(3, minmax(150px, 1fr));
 }
 
 .cell {
     cursor: pointer;
     font-family: "VT323", monospace;
     fill: var(--font-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px;
 }
 
 .line-top {

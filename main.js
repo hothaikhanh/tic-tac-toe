@@ -63,17 +63,20 @@ function GameController() {
 
     const rows = board.getRow();
     const cols = board.getColumn();
-    const _board = board.getBoard();
 
     //player controller
     let activePlayer = players[0];
+    const getPlayers = () => players;
     const switchPlayer = () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
+        console.log(activePlayer);
     };
     const getActivePlayer = () => activePlayer;
 
     //results controller
     const results = [];
+    const recordWinner = () => results.push(getActivePlayer().getToken());
+    const recordDraw = () => results.push("");
     const getResults = () => results;
 
     //game mode controller
@@ -83,10 +86,11 @@ function GameController() {
     };
     const getGameMode = () => gameMode;
 
-    const getPlayers = () => players;
+    //game logics
     const setNewBoard = () => board.setBoard();
 
     const checkWin = (x, y, tokenID) => {
+        const _board = board.getBoard();
         const winCondition = 3;
         let hori_result = [];
         let vert_result = [];
@@ -148,21 +152,28 @@ function GameController() {
         return true;
     };
 
-    const recordResult = () => {
-        results.push(getActivePlayer().getToken());
-    };
-
-    // const setNewRound = () => {
-    //     setNewBoard();
-    // };
-
     const forfeitRound = (playerID) => {
         activePlayer = players[playerID] == players[0] ? players[1] : players[0];
+        recordWinner();
     };
 
     const play = (x, y) => {
-        if (board.getBoard()[x][y].getVal() != "") return;
         board.markCell(x, y, getActivePlayer().getToken());
+    };
+
+    const resetAll = () => {
+        results.length = 0;
+        activePlayer = players[0];
+        // player1.setName = "";
+        // player2.setName = "";
+        // player1.setToken = "";
+        // player2.setToken = "";
+        setNewBoard();
+    };
+
+    const checkLegal = (x, y) => {
+        if (board.getBoard()[x][y].getVal() != "") return false;
+        return true;
     };
 
     return {
@@ -175,10 +186,12 @@ function GameController() {
         getPlayers,
         forfeitRound,
         play,
+        checkLegal,
         checkWin,
         checkDraw,
-        recordResult,
-        // setNewRound,
+        recordWinner,
+        recordDraw,
+        resetAll,
         getBoard: board.getBoard,
     };
 }
@@ -189,12 +202,24 @@ function ScreenController() {
     const playerMenu = document.querySelector(".player-menu");
     const gameBoard = document.querySelector(".game");
     const nameDisplays = document.querySelectorAll(".player_name");
+    const tokenDisplays = document.querySelectorAll(".player_token");
     const titleDisplays = document.querySelectorAll(".player_title");
     const scoreBoard = document.querySelectorAll(".score_display");
+    const indicators = document.querySelectorAll(".turn-indicator");
 
     const game = GameController();
     const rows = Board().getRow();
     const cols = Board().getColumn();
+
+    const showTitle = () => {
+        title.classList.remove("center");
+        gameBoard.classList.add("inactive");
+        setTimeout(() => {
+            gameBoard.classList.remove("active");
+        }, 500);
+        startMenu.classList.remove("inactive");
+        playerMenu.classList.remove("inactive");
+    };
 
     const showPlayerMenu = () => {
         title.classList.add("center");
@@ -202,14 +227,18 @@ function ScreenController() {
         playerMenu.classList.add("active");
     };
     const showGame = () => {
+        //display game area
+        clearAll();
         playerMenu.classList.add("inactive");
         setTimeout(() => {
             playerMenu.classList.remove("active");
         }, 500);
+
+        gameBoard.classList.remove("inactive");
         gameBoard.classList.add("active");
 
         console.log("...starting the game");
-
+        //display the player's title
         switch (game.getGameMode()) {
             case "pvp":
                 titleDisplays[0].innerText = "PLAYER ONE";
@@ -220,13 +249,16 @@ function ScreenController() {
                 titleDisplays[1].innerText = "BOT";
                 break;
         }
-
+        //display the player's info
         nameDisplays[0].innerText = game.getPlayers()[0].getName();
         nameDisplays[1].innerText = game.getPlayers()[1].getName();
+        tokenDisplays[0].innerText = "";
+        tokenDisplays[0].appendChild(getIcon(game.getPlayers()[0].getToken().nodeValue));
+        tokenDisplays[1].innerText = "";
+        tokenDisplays[1].appendChild(getIcon(game.getPlayers()[1].getToken().nodeValue));
     };
-
     const showWinner = () => {
-        console.log(game.getActivePlayer().getName() + " is the winner");
+        //todo
     };
     const showDraw = () => {
         //todo
@@ -237,6 +269,67 @@ function ScreenController() {
                 getCells()[x][y].innerText = "";
             }
         }
+    };
+    const getIcon = (tokenID) => {
+        let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        svg.setAttribute("width", "100%");
+
+        let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        switch (tokenID) {
+            case "cross":
+                svg.setAttribute("viewBox", "0 0 384 512");
+                path.setAttribute(
+                    "d",
+                    "M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
+                );
+                break;
+            case "circle":
+                svg.setAttribute("viewBox", "0 0 512 512");
+                path.setAttribute(
+                    "d",
+                    "M222.7 32.1c5 16.9-4.6 34.8-21.5 39.8C121.8 95.6 64 169.1 64 256c0 106 86 192 192 192s192-86 192-192c0-86.9-57.8-160.4-137.1-184.1c-16.9-5-26.6-22.9-21.5-39.8s22.9-26.6 39.8-21.5C434.9 42.1 512 140 512 256c0 141.4-114.6 256-256 256S0 397.4 0 256C0 140 77.1 42.1 182.9 10.6c16.9-5 34.8 4.6 39.8 21.5z"
+                );
+                break;
+            case "star":
+                svg.setAttribute("viewBox", "0 0 576 512");
+
+                path.setAttribute(
+                    "d",
+                    "M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-257-21.7L381.2 150.3 316.9 18z"
+                );
+                break;
+            case "heart":
+                svg.setAttribute("viewBox", "0 0 512 512");
+                path.setAttribute(
+                    "d",
+                    "M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"
+                );
+                break;
+            case "bolt":
+                svg.setAttribute("viewBox", "0 0 448 512");
+
+                path.setAttribute(
+                    "d",
+                    "M349.4 44.6c5.9-13.7 1.5-29.7-10.6-38.5s-28.6-8-39.9 1.8l-256 224c-10 8.8-13.6 22.9-8.9 35.3S50.7 288 64 288H175.5L98.6 467.4c-5.9 13.7-1.5 29.7 10.6 38.5s28.6 8 39.9-1.8l256-224c10-8.8 13.6-22.9 8.9-35.3s-16.6-20.7-30-20.7H272.5L349.4 44.6z"
+                );
+                break;
+            case "flame":
+                svg.setAttribute("viewBox", "0 0 384 512");
+                path.setAttribute(
+                    "d",
+                    "M153.6 29.9l16-21.3C173.6 3.2 180 0 186.7 0C198.4 0 208 9.6 208 21.3V43.5c0 13.1 5.4 25.7 14.9 34.7L307.6 159C356.4 205.6 384 270.2 384 337.7C384 434 306 512 209.7 512H192C86 512 0 426 0 320v-3.8c0-48.8 19.4-95.6 53.9-130.1l3.5-3.5c4.2-4.2 10-6.6 16-6.6C85.9 176 96 186.1 96 198.6V288c0 35.3 28.7 64 64 64s64-28.7 64-64v-3.9c0-18-7.2-35.3-19.9-48l-38.6-38.6c-24-24-37.5-56.7-37.5-90.7c0-27.7 9-54.8 25.6-76.9z"
+                );
+                break;
+            case "draw":
+                svg.setAttribute("viewBox", "0 0 448 512");
+                path.setAttribute(
+                    "d",
+                    "M48 128c-17.7 0-32 14.3-32 32s14.3 32 32 32H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H48zm0 192c-17.7 0-32 14.3-32 32s14.3 32 32 32H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H48z"
+                );
+        }
+        svg.appendChild(path);
+        return svg;
     };
     const getCells = () => {
         // Create an array to store all of the DOM element of cells from the UI
@@ -260,16 +353,48 @@ function ScreenController() {
         }
     };
     const updateCell = (x, y) => {
-        getCells()[x][y].innerText = game.getBoard()[x][y].getVal().nodeValue;
+        getCells()[x][y].appendChild(getIcon(game.getActivePlayer().getToken().nodeValue));
+    };
+    const updateScore = () => {
+        let rounds = game.getResults();
+        let lastestRound = rounds.length - 1;
+        let iconValue = rounds[lastestRound] == "" ? "draw" : rounds[lastestRound].nodeValue;
+        scoreBoard[lastestRound].appendChild(getIcon(iconValue));
     };
 
-    const updateScore = () => {
-        currentRounds = game.getResults();
-        for (let i = 0; i < currentRounds.length; i++) {
-            scoreBoard[i].innerText = currentRounds[i];
+    const clearAll = () => {
+        for (let score of scoreBoard) {
+            score.innerText = "";
+        }
+
+        for (let x = 0; x < rows; ++x) {
+            for (let y = 0; y < cols; ++y) {
+                getCells()[x][y].innerText = "";
+            }
         }
     };
 
+    const moveIndicator = () => {
+        indicators[0].classList.toggle("inactive");
+        indicators[1].classList.toggle("inactive");
+        setTimeout(() => {
+            indicators[0].classList.toggle("active");
+            indicators[1].classList.toggle("active");
+        }, 300);
+    };
+
+    const resetIndicator = () => {
+        console.log("reseting");
+        console.log(game.getActivePlayer());
+        console.log(game.getPlayers()[1]);
+        if (game.getActivePlayer() == game.getPlayers()[1]) {
+            console.log("current player is 2");
+            indicators[1].classList.remove("active");
+            indicators[1].classList.add("inactive");
+            indicators[0].classList.remove("inactive");
+            indicators[0].classList.add("active");
+        }
+    };
     const startMenuEventHandler = (function () {
         const gameModeOpts = document.querySelectorAll(".start-menu > button");
 
@@ -330,6 +455,7 @@ function ScreenController() {
         for (let x = 0; x < rows; x++) {
             for (let y = 0; y < cols; y++) {
                 getCells()[x][y].addEventListener("click", () => {
+                    if (!game.checkLegal(x, y)) return;
                     //make the move
                     game.play(x, y);
                     //update the coresponding cell to reflect the player's move
@@ -339,7 +465,7 @@ function ScreenController() {
                         //anounce the winner
                         showWinner();
                         //record the result of the round
-                        game.recordResult();
+                        game.recordWinner();
                         updateScore();
                         //clear board
                         clearBoard();
@@ -348,20 +474,36 @@ function ScreenController() {
 
                     // if not then check if the game can still continue
                     if (game.checkDraw()) {
-                        console.log("it is draw");
+                        showDraw();
+                        game.recordDraw();
+                        updateScore();
+                        clearBoard();
+                        game.setNewBoard();
                     }
 
                     game.switchPlayer();
+                    moveIndicator();
                 });
             }
         }
-
+        //add event for forfeit buttons
         const ffBtns = document.querySelectorAll(".ff");
         for (let playerID = 0; playerID < ffBtns.length; playerID++) {
             ffBtns[playerID].addEventListener("click", () => {
                 game.forfeitRound(playerID);
+                showWinner();
+                updateScore();
+                clearBoard();
+                game.setNewBoard();
             });
         }
+        //add event for game end button
+        const resetBtn = document.querySelector(".reset");
+        resetBtn.addEventListener("click", () => {
+            resetIndicator();
+            game.resetAll();
+            showTitle();
+        });
     })();
 }
 
