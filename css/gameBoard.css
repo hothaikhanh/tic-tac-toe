@@ -205,6 +205,10 @@
     padding: 50px;
 }
 
+.cell.highlight {
+    animation: cell 1s forwards;
+}
+
 .line-top {
     border-top: 2px solid rgba(255, 255, 255, 0.3);
 }

@@ -155,3 +155,13 @@ button {
         transform: translateX(0px);
     }
 }
+
+@keyframes cell {
+    0% {
+    }
+    100% {
+        fill: var(--background-color);
+        background-color: var(--font-color);
+        border-color: var(--background-color);
+    }
+}

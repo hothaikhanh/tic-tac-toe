@@ -64,20 +64,23 @@ function GameController() {
     const rows = board.getRow();
     const cols = board.getColumn();
 
+    //game result controller
+    let result;
+    const getResult = () => result;
+
     //player controller
     let activePlayer = players[0];
     const getPlayers = () => players;
     const switchPlayer = () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
-        console.log(activePlayer);
     };
     const getActivePlayer = () => activePlayer;
 
     //results controller
-    const results = [];
-    const recordWinner = () => results.push(getActivePlayer().getToken());
-    const recordDraw = () => results.push("");
-    const getResults = () => results;
+    const score = [];
+    const recordWinner = () => score.push(getActivePlayer().getToken());
+    const recordDraw = () => score.push("");
+    const getScore = () => score;
 
     //game mode controller
     let gameMode = "";
@@ -92,10 +95,10 @@ function GameController() {
     const checkWin = (x, y, tokenID) => {
         const _board = board.getBoard();
         const winCondition = 3;
-        let hori_result = [];
-        let vert_result = [];
-        let diag_1_result = [];
-        let diag_2_result = [];
+        let hori_result = [[x, y]];
+        let vert_result = [[x, y]];
+        let diag_1_result = [[x, y]];
+        let diag_2_result = [[x, y]];
 
         // console.log(`Cheking the area around cell [${x},${y}]`);
 
@@ -111,20 +114,20 @@ function GameController() {
             // | ${diag_2[1]} | ${vert[1]} | ${diag_1[1]} |`);
 
             // console.log("check vertical");
-            if (vert[1] && _board[x + i][y].getVal() == tokenID) vert_result.push(_board[x + i][y]);
-            if (vert[0] && _board[x - i][y].getVal() == tokenID) vert_result.unshift(_board[x - i][y]);
+            if (vert[1] && _board[x + i][y].getVal() == tokenID) vert_result.push([x + i, y]);
+            if (vert[0] && _board[x - i][y].getVal() == tokenID) vert_result.unshift([x - i, y]);
 
             // console.log("check horizontal");
-            if (hori[1] && _board[x][y + i].getVal() == tokenID) hori_result.push(_board[x][y + i]);
-            if (hori[0] && _board[x][y - i].getVal() == tokenID) hori_result.unshift(_board[x][y - i]);
+            if (hori[1] && _board[x][y + i].getVal() == tokenID) hori_result.push([x, y + i]);
+            if (hori[0] && _board[x][y - i].getVal() == tokenID) hori_result.unshift([x, y - i]);
 
             // console.log("check diagonal_1");
-            if (diag_1[0] && _board[x - i][y - i].getVal() == tokenID) diag_1_result.unshift(_board[x - i][y - i]);
-            if (diag_1[1] && _board[x + i][y + i].getVal() == tokenID) diag_1_result.push(_board[x + i][y + i]);
+            if (diag_1[0] && _board[x - i][y - i].getVal() == tokenID) diag_1_result.unshift([x - i, y - i]);
+            if (diag_1[1] && _board[x + i][y + i].getVal() == tokenID) diag_1_result.push([x + i, y + i]);
 
             // console.log("check diagonal_2");
-            if (diag_2[0] && _board[x - i][y + i].getVal() == tokenID) diag_2_result.unshift(_board[x - i][y + i]);
-            if (diag_2[1] && _board[x + i][y - i].getVal() == tokenID) diag_2_result.push(_board[x + i][y - i]);
+            if (diag_2[0] && _board[x - i][y + i].getVal() == tokenID) diag_2_result.unshift([x - i, y + i]);
+            if (diag_2[1] && _board[x + i][y - i].getVal() == tokenID) diag_2_result.push([x + i, y - i]);
         }
 
         console.log(`Player ${getActivePlayer().getName()} results:
@@ -133,13 +136,19 @@ function GameController() {
             Diagonal_1: ${diag_1_result.length}
             Diagonal_2: ${diag_2_result.length}`);
 
-        if (
-            hori_result.length >= winCondition - 1 ||
-            vert_result.length >= winCondition - 1 ||
-            diag_1_result.length >= winCondition - 1 ||
-            diag_2_result.length >= winCondition - 1
-        )
+        if (hori_result.length >= winCondition) {
+            result = hori_result;
             return true;
+        } else if (vert_result.length >= winCondition) {
+            result = vert_result;
+            return true;
+        } else if (diag_1_result.length >= winCondition) {
+            result = diag_1_result;
+            return true;
+        } else if (diag_2_result.length >= winCondition) {
+            result = diag_2_result;
+            return true;
+        }
         return false;
     };
 
@@ -155,6 +164,7 @@ function GameController() {
     const forfeitRound = (playerID) => {
         activePlayer = players[playerID] == players[0] ? players[1] : players[0];
         recordWinner();
+        console.log(getActivePlayer().getName());
     };
 
     const play = (x, y) => {
@@ -162,12 +172,8 @@ function GameController() {
     };
 
     const resetAll = () => {
-        results.length = 0;
+        score.length = 0;
         activePlayer = players[0];
-        // player1.setName = "";
-        // player2.setName = "";
-        // player1.setToken = "";
-        // player2.setToken = "";
         setNewBoard();
     };
 
@@ -180,7 +186,8 @@ function GameController() {
         setNewBoard,
         getGameMode,
         setGameMode,
-        getResults,
+        getScore,
+        getResult,
         getActivePlayer,
         switchPlayer,
         getPlayers,
@@ -197,6 +204,8 @@ function GameController() {
 }
 
 function ScreenController() {
+    const endRoundDuration = 2000;
+
     const title = document.querySelector(".title");
     const startMenu = document.querySelector(".start-menu");
     const playerMenu = document.querySelector(".player-menu");
@@ -257,9 +266,18 @@ function ScreenController() {
         tokenDisplays[1].innerText = "";
         tokenDisplays[1].appendChild(getIcon(game.getPlayers()[1].getToken().nodeValue));
     };
-    const showWinner = () => {
-        //todo
+
+    const hightlightCells = (duration) => {
+        let res = game.getResult();
+        for (let i = 0; i < res.length; i++) {
+            let target = getCells()[res[i][0]][res[i][1]];
+            target.classList.add("highlight");
+            setTimeout(() => {
+                target.classList.remove("highlight");
+            }, duration);
+        }
     };
+    const showWinner = () => {};
     const showDraw = () => {
         //todo
     };
@@ -356,9 +374,9 @@ function ScreenController() {
         getCells()[x][y].appendChild(getIcon(game.getActivePlayer().getToken().nodeValue));
     };
     const updateScore = () => {
-        let rounds = game.getResults();
-        let lastestRound = rounds.length - 1;
-        let iconValue = rounds[lastestRound] == "" ? "draw" : rounds[lastestRound].nodeValue;
+        let scores = game.getScore();
+        let lastestRound = scores.length - 1;
+        let iconValue = scores[lastestRound] == "" ? "draw" : scores[lastestRound].nodeValue;
         scoreBoard[lastestRound].appendChild(getIcon(iconValue));
     };
 
@@ -384,9 +402,6 @@ function ScreenController() {
     };
 
     const resetIndicator = () => {
-        console.log("reseting");
-        console.log(game.getActivePlayer());
-        console.log(game.getPlayers()[1]);
         if (game.getActivePlayer() == game.getPlayers()[1]) {
             console.log("current player is 2");
             indicators[1].classList.remove("active");
@@ -462,14 +477,20 @@ function ScreenController() {
                     updateCell(x, y);
                     //check if the move that has just been made have won the game
                     if (game.checkWin(x, y, game.getActivePlayer().getToken())) {
+                        game.recordWinner();
+                        game.setNewBoard();
+                        game.switchPlayer();
                         //anounce the winner
+                        hightlightCells(2000);
                         showWinner();
                         //record the result of the round
-                        game.recordWinner();
                         updateScore();
                         //clear board
-                        clearBoard();
-                        game.setNewBoard();
+                        setTimeout(() => {
+                            clearBoard();
+                            moveIndicator();
+                        }, 2000);
+                        return;
                     }
 
                     // if not then check if the game can still continue
@@ -480,7 +501,6 @@ function ScreenController() {
                         clearBoard();
                         game.setNewBoard();
                     }
-
                     game.switchPlayer();
                     moveIndicator();
                 });
@@ -495,6 +515,8 @@ function ScreenController() {
                 updateScore();
                 clearBoard();
                 game.setNewBoard();
+                game.switchPlayer();
+                moveIndicator();
             });
         }
         //add event for game end button
