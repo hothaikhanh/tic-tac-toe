@@ -72,6 +72,18 @@ button {
     -webkit-backdrop-filter: blur(20px);
 }
 
+.block-overlay {
+    position: absolute;
+    display: none;
+    width: 100%;
+    height: 100%;
+    z-index: 99;
+}
+
+.block-overlay.active {
+    display: block;
+}
+
 @keyframes floatIn {
     0% {
         transform: translateY(300px);

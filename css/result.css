@@ -1,0 +1,54 @@
+.result_container {
+    position: absolute;
+    z-index: 99;
+    height: 100%;
+    width: 100%;
+    display: none;
+    align-items: center;
+}
+
+.result_container.active {
+    display: flex;
+}
+
+.result_overlay {
+    animation: fadeIn 1s forwards ease-in;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0.6;
+}
+
+.result {
+    box-sizing: border-box;
+    border-left: none;
+    border-right: none;
+    height: clamp(200px, 30%, 300px);
+    width: 100%;
+    padding: 50px;
+    font-size: 2.5rem;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    animation: fadeIn 1s forwards ease-in;
+}
+
+.inactive .result,
+.inactive .result_overlay {
+    animation: fadeOut 0.5s forwards ease-in-out;
+}
+
+.result--win.active {
+    display: flex;
+}
+
+.result--tie.active {
+    display: flex;
+    font-size: 5rem;
+}
+
+.winner_name {
+    font-size: 5rem;
+}

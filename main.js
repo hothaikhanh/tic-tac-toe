@@ -64,10 +64,6 @@ function GameController() {
     const rows = board.getRow();
     const cols = board.getColumn();
 
-    //game result controller
-    let result;
-    const getResult = () => result;
-
     //player controller
     let activePlayer = players[0];
     const getPlayers = () => players;
@@ -76,11 +72,29 @@ function GameController() {
     };
     const getActivePlayer = () => activePlayer;
 
-    //results controller
+    //score controller
     const score = [];
-    const recordWinner = () => score.push(getActivePlayer().getToken());
-    const recordDraw = () => score.push("");
+    const recordScore = () => {
+        if (checkWin()) score.push(getActivePlayer().getToken());
+        if (checkDraw()) score.push("");
+    };
     const getScore = () => score;
+    const getGameWinner = () => {
+        let p1_score = 0,
+            p2_score = 0;
+        for (let s of score) {
+            if (s == player1.getToken()) p1_score++;
+            if (s == player2.getToken()) p2_score++;
+        }
+        switch (true) {
+            case p1_score > p2_score:
+                return player1.getName();
+            case p1_score < p2_score:
+                return player2.getName();
+            case p1_score == p2_score:
+                return false;
+        }
+    };
 
     //game mode controller
     let gameMode = "";
@@ -90,15 +104,34 @@ function GameController() {
     const getGameMode = () => gameMode;
 
     //game logics
-    const setNewBoard = () => board.setBoard();
+    let latestMove = [];
+    let cellChain = [];
+    const getCellChain = () => cellChain;
 
-    const checkWin = (x, y, tokenID) => {
+    const setNewBoard = () => {
+        latestMove = [];
+        cellChain = [];
+        board.setBoard();
+    };
+
+    const play = (x, y) => {
+        board.markCell(x, y, getActivePlayer().getToken());
+        latestMove = [x, y, getActivePlayer().getToken()];
+    };
+    const checkLegal = (x, y) => {
+        if (board.getBoard()[x][y].getVal() != "") return false;
+        return true;
+    };
+    const checkWin = () => {
         const _board = board.getBoard();
         const winCondition = 3;
-        let hori_result = [[x, y]];
-        let vert_result = [[x, y]];
-        let diag_1_result = [[x, y]];
-        let diag_2_result = [[x, y]];
+        let x = latestMove[0];
+        let y = latestMove[1];
+        let tokenID = latestMove[2];
+        let hori_chain = [[x, y]];
+        let vert_chain = [[x, y]];
+        let diag_1_chain = [[x, y]];
+        let diag_2_chain = [[x, y]];
 
         // console.log(`Cheking the area around cell [${x},${y}]`);
 
@@ -114,61 +147,59 @@ function GameController() {
             // | ${diag_2[1]} | ${vert[1]} | ${diag_1[1]} |`);
 
             // console.log("check vertical");
-            if (vert[1] && _board[x + i][y].getVal() == tokenID) vert_result.push([x + i, y]);
-            if (vert[0] && _board[x - i][y].getVal() == tokenID) vert_result.unshift([x - i, y]);
+            if (vert[1] && _board[x + i][y].getVal() == tokenID) vert_chain.push([x + i, y]);
+            if (vert[0] && _board[x - i][y].getVal() == tokenID) vert_chain.unshift([x - i, y]);
 
             // console.log("check horizontal");
-            if (hori[1] && _board[x][y + i].getVal() == tokenID) hori_result.push([x, y + i]);
-            if (hori[0] && _board[x][y - i].getVal() == tokenID) hori_result.unshift([x, y - i]);
+            if (hori[1] && _board[x][y + i].getVal() == tokenID) hori_chain.push([x, y + i]);
+            if (hori[0] && _board[x][y - i].getVal() == tokenID) hori_chain.unshift([x, y - i]);
 
             // console.log("check diagonal_1");
-            if (diag_1[0] && _board[x - i][y - i].getVal() == tokenID) diag_1_result.unshift([x - i, y - i]);
-            if (diag_1[1] && _board[x + i][y + i].getVal() == tokenID) diag_1_result.push([x + i, y + i]);
+            if (diag_1[0] && _board[x - i][y - i].getVal() == tokenID) diag_1_chain.unshift([x - i, y - i]);
+            if (diag_1[1] && _board[x + i][y + i].getVal() == tokenID) diag_1_chain.push([x + i, y + i]);
 
             // console.log("check diagonal_2");
-            if (diag_2[0] && _board[x - i][y + i].getVal() == tokenID) diag_2_result.unshift([x - i, y + i]);
-            if (diag_2[1] && _board[x + i][y - i].getVal() == tokenID) diag_2_result.push([x + i, y - i]);
+            if (diag_2[0] && _board[x - i][y + i].getVal() == tokenID) diag_2_chain.unshift([x - i, y + i]);
+            if (diag_2[1] && _board[x + i][y - i].getVal() == tokenID) diag_2_chain.push([x + i, y - i]);
         }
 
-        console.log(`Player ${getActivePlayer().getName()} results:
-            Horizontal: ${hori_result.length}
-            Vertical: ${vert_result.length}
-            Diagonal_1: ${diag_1_result.length}
-            Diagonal_2: ${diag_2_result.length}`);
+        // console.log(`Player ${getActivePlayer().getName()} results:
+        //     Horizontal: ${hori_chain.length}
+        //     Vertical: ${vert_chain.length}
+        //     Diagonal_1: ${diag_1_chain.length}
+        //     Diagonal_2: ${diag_2_chain.length}`);
 
-        if (hori_result.length >= winCondition) {
-            result = hori_result;
+        if (hori_chain.length >= winCondition) {
+            cellChain = hori_chain;
             return true;
-        } else if (vert_result.length >= winCondition) {
-            result = vert_result;
+        } else if (vert_chain.length >= winCondition) {
+            cellChain = vert_chain;
             return true;
-        } else if (diag_1_result.length >= winCondition) {
-            result = diag_1_result;
+        } else if (diag_1_chain.length >= winCondition) {
+            cellChain = diag_1_chain;
             return true;
-        } else if (diag_2_result.length >= winCondition) {
-            result = diag_2_result;
+        } else if (diag_2_chain.length >= winCondition) {
+            cellChain = diag_2_chain;
             return true;
         }
         return false;
     };
-
     const checkDraw = () => {
         for (let j = 0; j < rows; j++) {
             for (let k = 0; k < cols; k++) {
                 if (board.getBoard()[j][k].getVal() == "") return false;
             }
         }
-        return true;
+        return cellChain.length == 0;
+    };
+    const checkEnd = () => {
+        return getScore().length >= 5 ? true : false;
     };
 
     const forfeitRound = (playerID) => {
         activePlayer = players[playerID] == players[0] ? players[1] : players[0];
-        recordWinner();
+        score.push(getActivePlayer().getToken());
         console.log(getActivePlayer().getName());
-    };
-
-    const play = (x, y) => {
-        board.markCell(x, y, getActivePlayer().getToken());
     };
 
     const resetAll = () => {
@@ -177,17 +208,12 @@ function GameController() {
         setNewBoard();
     };
 
-    const checkLegal = (x, y) => {
-        if (board.getBoard()[x][y].getVal() != "") return false;
-        return true;
-    };
-
     return {
         setNewBoard,
         getGameMode,
         setGameMode,
         getScore,
-        getResult,
+        getCellChain,
         getActivePlayer,
         switchPlayer,
         getPlayers,
@@ -196,9 +222,11 @@ function GameController() {
         checkLegal,
         checkWin,
         checkDraw,
-        recordWinner,
-        recordDraw,
+        checkEnd,
+        getGameWinner,
+        recordScore,
         resetAll,
+
         getBoard: board.getBoard,
     };
 }
@@ -215,6 +243,11 @@ function ScreenController() {
     const titleDisplays = document.querySelectorAll(".player_title");
     const scoreBoard = document.querySelectorAll(".score_display");
     const indicators = document.querySelectorAll(".turn-indicator");
+    const screenBlocker = document.querySelector(".block-overlay");
+    const endResult = document.querySelector(".result_container");
+    const winResult = document.querySelector(".result--win");
+    const tieResult = document.querySelector(".result--tie");
+    const winnerNameDisplay = document.querySelector(".winner_name");
 
     const game = GameController();
     const rows = Board().getRow();
@@ -229,7 +262,6 @@ function ScreenController() {
         startMenu.classList.remove("inactive");
         playerMenu.classList.remove("inactive");
     };
-
     const showPlayerMenu = () => {
         title.classList.add("center");
         startMenu.classList.add("inactive");
@@ -237,7 +269,6 @@ function ScreenController() {
     };
     const showGame = () => {
         //display game area
-        clearAll();
         playerMenu.classList.add("inactive");
         setTimeout(() => {
             playerMenu.classList.remove("active");
@@ -266,9 +297,8 @@ function ScreenController() {
         tokenDisplays[1].innerText = "";
         tokenDisplays[1].appendChild(getIcon(game.getPlayers()[1].getToken().nodeValue));
     };
-
-    const hightlightCells = (duration) => {
-        let res = game.getResult();
+    const showWinner = (duration) => {
+        let res = game.getCellChain();
         for (let i = 0; i < res.length; i++) {
             let target = getCells()[res[i][0]][res[i][1]];
             target.classList.add("highlight");
@@ -277,9 +307,21 @@ function ScreenController() {
             }, duration);
         }
     };
-    const showWinner = () => {};
-    const showDraw = () => {
-        //todo
+    const blockScreen = (duration) => {
+        screenBlocker.classList.add("active");
+        setTimeout(() => {
+            screenBlocker.classList.remove("active");
+        }, duration);
+    };
+    const showDraw = (duration) => {
+        for (let x = 0; x < rows; ++x) {
+            for (let y = 0; y < cols; ++y) {
+                getCells()[x][y].classList.add("highlight");
+                setTimeout(() => {
+                    getCells()[x][y].classList.remove("highlight");
+                }, duration);
+            }
+        }
     };
     const clearBoard = () => {
         for (let x = 0; x < rows; ++x) {
@@ -375,12 +417,12 @@ function ScreenController() {
     };
     const updateScore = () => {
         let scores = game.getScore();
+
         let lastestRound = scores.length - 1;
         let iconValue = scores[lastestRound] == "" ? "draw" : scores[lastestRound].nodeValue;
         scoreBoard[lastestRound].appendChild(getIcon(iconValue));
     };
-
-    const clearAll = () => {
+    const resetAll = () => {
         for (let score of scoreBoard) {
             score.innerText = "";
         }
@@ -390,8 +432,26 @@ function ScreenController() {
                 getCells()[x][y].innerText = "";
             }
         }
-    };
 
+        if (endResult.classList.contains("active")) {
+            endResult.classList.add("inactive");
+            setTimeout(() => {
+                endResult.classList.remove("inactive");
+                endResult.classList.remove("active");
+                winResult.classList.remove("active");
+                tieResult.classList.remove("active");
+            }, 1000);
+        } else {
+            endResult.classList.remove("active");
+            winResult.classList.remove("active");
+            tieResult.classList.remove("active");
+        }
+
+        indicators[1].classList.remove("active");
+        indicators[1].classList.add("inactive");
+        indicators[0].classList.remove("inactive");
+        indicators[0].classList.add("active");
+    };
     const moveIndicator = () => {
         indicators[0].classList.toggle("inactive");
         indicators[1].classList.toggle("inactive");
@@ -400,14 +460,13 @@ function ScreenController() {
             indicators[1].classList.toggle("active");
         }, 300);
     };
-
-    const resetIndicator = () => {
-        if (game.getActivePlayer() == game.getPlayers()[1]) {
-            console.log("current player is 2");
-            indicators[1].classList.remove("active");
-            indicators[1].classList.add("inactive");
-            indicators[0].classList.remove("inactive");
-            indicators[0].classList.add("active");
+    const showGameResult = () => {
+        endResult.classList.add("active");
+        if (game.getGameWinner() == false) {
+            tieResult.classList.add("active");
+        } else {
+            winResult.classList.add("active");
+            winnerNameDisplay.innerText = game.getGameWinner();
         }
     };
     const startMenuEventHandler = (function () {
@@ -420,7 +479,6 @@ function ScreenController() {
             });
         }
     })();
-
     const multiPlayerMenuEventHandler = (function () {
         const submitBtn = document.querySelector("#multiPlayerSubmit");
         const submitCondition = [true, true];
@@ -464,45 +522,38 @@ function ScreenController() {
             }
         });
     })();
-
     const gameEventHandler = (function () {
         // add event for each cell on the board
         for (let x = 0; x < rows; x++) {
             for (let y = 0; y < cols; y++) {
                 getCells()[x][y].addEventListener("click", () => {
                     if (!game.checkLegal(x, y)) return;
-                    //make the move
                     game.play(x, y);
-                    //update the coresponding cell to reflect the player's move
                     updateCell(x, y);
-                    //check if the move that has just been made have won the game
-                    if (game.checkWin(x, y, game.getActivePlayer().getToken())) {
-                        game.recordWinner();
-                        game.setNewBoard();
-                        game.switchPlayer();
-                        //anounce the winner
-                        hightlightCells(2000);
-                        showWinner();
-                        //record the result of the round
+                    if (game.checkWin() || game.checkDraw()) {
+                        game.recordScore();
                         updateScore();
-                        //clear board
+                        blockScreen(2000);
                         setTimeout(() => {
-                            clearBoard();
-                            moveIndicator();
+                            if (game.checkEnd()) {
+                                showGameResult();
+                            } else {
+                                game.switchPlayer();
+                                moveIndicator();
+                                game.setNewBoard();
+                                clearBoard();
+                            }
                         }, 2000);
-                        return;
                     }
 
-                    // if not then check if the game can still continue
-                    if (game.checkDraw()) {
-                        showDraw();
-                        game.recordDraw();
-                        updateScore();
-                        clearBoard();
-                        game.setNewBoard();
+                    if (game.checkWin()) {
+                        showWinner(2000);
+                    } else if (game.checkDraw()) {
+                        showDraw(2000);
+                    } else {
+                        game.switchPlayer();
+                        moveIndicator();
                     }
-                    game.switchPlayer();
-                    moveIndicator();
                 });
             }
         }
@@ -511,21 +562,28 @@ function ScreenController() {
         for (let playerID = 0; playerID < ffBtns.length; playerID++) {
             ffBtns[playerID].addEventListener("click", () => {
                 game.forfeitRound(playerID);
-                showWinner();
                 updateScore();
-                clearBoard();
-                game.setNewBoard();
+                blockScreen(1000);
+                if (game.checkEnd()) {
+                    showGameResult();
+                }
                 game.switchPlayer();
                 moveIndicator();
+                game.setNewBoard();
+                clearBoard();
             });
         }
         //add event for game end button
-        const resetBtn = document.querySelector(".reset");
-        resetBtn.addEventListener("click", () => {
-            resetIndicator();
-            game.resetAll();
-            showTitle();
-        });
+        const resetBtns = document.querySelectorAll(".reset");
+        for (let btn of resetBtns) {
+            btn.addEventListener("click", () => {
+                setTimeout(() => {
+                    resetAll();
+                }, 500);
+                game.resetAll();
+                showTitle();
+            });
+        }
     })();
 }
 

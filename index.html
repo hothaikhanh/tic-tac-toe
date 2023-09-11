@@ -16,10 +16,11 @@
     </head>
 
     <body>
+        <div class="block-overlay"></div>
         <div class="title">Tic Tac Toe</div>
 
         <div class="start-menu">
-            <button>Single Player</button>
+            <button>Single Player(In development)</button>
             <button>Multiplayer</button>
         </div>
 
@@ -182,6 +183,19 @@
                 <p class="player_title"></p>
                 <div class="player_name"></div>
                 <div class="player_token"></div>
+            </div>
+        </div>
+
+        <div class="result_container">
+            <div class="result_overlay"></div>
+            <div class="result glass_effect result--win blur">
+                <p>The winner is</p>
+                <p class="winner_name">Player name</p>
+                <div class="reset">RETURN</div>
+            </div>
+            <div class="result result--tie glass_effect blur">
+                <p>It's a tie</p>
+                <div class="reset">RETURN</div>
             </div>
         </div>
     </body>
