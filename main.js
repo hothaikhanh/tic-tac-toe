@@ -471,13 +471,14 @@ function ScreenController() {
     };
     const startMenuEventHandler = (function () {
         const gameModeOpts = document.querySelectorAll(".start-menu > button");
+        gameModeOpts[0].addEventListener("click", (e) => {
+            window.alert("Game mode currently in development");
+        });
 
-        for (let btn of gameModeOpts) {
-            btn.addEventListener("click", (e) => {
-                e.target === gameModeOpts[0] ? game.setGameMode("pve") : game.setGameMode("pvp");
-                showPlayerMenu();
-            });
-        }
+        gameModeOpts[1].addEventListener("click", (e) => {
+            e.target === gameModeOpts[0] ? game.setGameMode("pve") : game.setGameMode("pvp");
+            showPlayerMenu();
+        });
     })();
     const multiPlayerMenuEventHandler = (function () {
         const submitBtn = document.querySelector("#multiPlayerSubmit");
