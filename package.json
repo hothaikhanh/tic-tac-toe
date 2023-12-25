@@ -12,7 +12,8 @@
   "main": "main.js",
   "scripts": {
     "devstart": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "sass": "sass --watch ./src/stylesheets/scss/style.scss:./src/stylesheets/css/style.css"
   },
   "repository": {
     "type": "git",
