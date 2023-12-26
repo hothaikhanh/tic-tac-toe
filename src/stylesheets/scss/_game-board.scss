@@ -1,4 +1,9 @@
+@import "./utilities/animations";
+@import "./utilities/mixins";
+
 .game {
+    @include blur_effect;
+
     position: relative;
     display: none;
     justify-content: center;
@@ -7,18 +12,19 @@
     min-width: 1300px;
     height: 100%;
     min-height: 700px;
-}
 
-.game.active {
-    animation: floatIn 0.8s forwards ease-in-out;
-    display: flex;
-}
+    &.active {
+        animation: floatIn 0.8s forwards ease-in-out;
+        display: flex;
+    }
 
-.game.inactive {
-    animation: floatOut 0.5s forwards ease-in-out;
+    &.inactive {
+        animation: floatOut 0.5s forwards ease-in-out;
+    }
 }
 
 .player_info {
+    @include glass_effect;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -30,16 +36,16 @@
     color: var(--font-color);
     font-family: "VT323", monospace;
     position: relative;
-}
 
-.player_info.left {
-    border-radius: 25px 0px 0px 25px;
-    right: -2px;
-}
+    &.left {
+        border-radius: 25px 0px 0px 25px;
+        right: -2px;
+    }
 
-.player_info.right {
-    border-radius: 0px 25px 25px 0px;
-    left: -2px;
+    &.right {
+        border-radius: 0px 25px 25px 0px;
+        left: -2px;
+    }
 }
 
 .player_title {
@@ -61,6 +67,7 @@
 }
 
 .board {
+    @include glass_effect;
     position: relative;
     height: clamp(700px, 90%, 900px);
     z-index: 10;
@@ -108,10 +115,10 @@
     font-size: 1.5rem;
     opacity: 0.3;
     cursor: pointer;
-}
 
-.reset:hover {
-    opacity: 1;
+    &:hover {
+        opacity: 1;
+    }
 }
 
 .ff {
@@ -149,39 +156,44 @@
     white-space: nowrap;
     display: none;
     justify-content: center;
+
+    span {
+        position: absolute;
+        bottom: 75px;
+    }
+
+    &.active {
+        display: flex;
+    }
 }
 
-.turn-indicator span {
-    position: absolute;
-    bottom: 75px;
-}
-.turn-indicator.active {
-    display: flex;
-}
-
-.left .turn-indicator.active {
-    animation: floatInRight 0.3s ease-out forwards;
+.left .turn-indicator {
+    &.active {
+        animation: floatInRight 0.3s ease-out forwards;
+    }
+    &.inactive {
+        animation: floatOutRight 0.3s ease-in forwards;
+    }
 }
 
-.right .turn-indicator.active {
-    animation: floatInLeft 0.3s ease-out forwards;
+.right .turn-indicator {
+    &.active {
+        animation: floatInLeft 0.3s ease-out forwards;
+    }
+    &.inactive {
+        animation: floatOutLeft 0.3s ease-in forwards;
+    }
 }
 
-.left .turn-indicator.inactive {
-    animation: floatOutRight 0.3s ease-in forwards;
-}
+.player_info:hover {
+    .ff {
+        display: flex;
+        animation: fadeIn 0.4s ease-in forwards;
+    }
 
-.right .turn-indicator.inactive {
-    animation: floatOutLeft 0.3s ease-in forwards;
-}
-
-.player_info:hover .ff {
-    display: flex;
-    animation: fadeIn 0.4s ease-in forwards;
-}
-
-.player_info:hover .turn-indicator {
-    animation: fadeOut 0.4s ease-in forwards;
+    .turn-indicator {
+        animation: fadeOut 0.4s ease-in forwards;
+    }
 }
 
 .grid {
@@ -203,10 +215,10 @@
     justify-content: center;
     align-items: center;
     padding: 50px;
-}
 
-.cell.highlight {
-    animation: cell 1s forwards;
+    &.highlight {
+        animation: cell 1s forwards;
+    }
 }
 
 .line-top {

@@ -5,10 +5,10 @@
     width: 100%;
     display: none;
     align-items: center;
-}
 
-.result_container.active {
-    display: flex;
+    &.active {
+        display: flex;
+    }
 }
 
 .result_overlay {

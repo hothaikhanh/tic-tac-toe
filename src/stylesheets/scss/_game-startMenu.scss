@@ -1,14 +1,18 @@
 .start-menu {
-    position: absolute;
     display: flex;
+    position: relative;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    top: 60%;
-}
+    top: 20%;
 
-.start-menu.inactive {
-    display: none;
+    &.active {
+        display: flex;
+    }
+
+    &.inactive {
+        display: none;
+    }
 }
 
 .start-menu button {
@@ -20,17 +24,16 @@
     color: inherit;
     font-family: "VT323", monospace;
     margin-bottom: 20px;
-}
 
-.start-menu button:hover {
-    color: white;
-}
+    &:hover {
+        color: white;
+        &::before {
+            display: inline;
+        }
+    }
 
-.start-menu button:hover::before {
-    display: inline;
-}
-
-.start-menu button::before {
-    content: "> ";
-    display: none;
+    &::before {
+        content: "> ";
+        display: none;
+    }
 }

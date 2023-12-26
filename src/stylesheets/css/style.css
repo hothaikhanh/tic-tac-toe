@@ -11,18 +11,33 @@
   margin: 0;
 }
 
+input[type=text]:focus {
+  outline: none;
+}
+
 html,
 body {
-  height: 100%;
-  font-family: "VT323", monospace;
-  color: var(--font-color);
-  background-color: var(--background-color);
-  color: var(--background-font-color);
-  font-family: "VT323", monospace;
   width: 100%;
   min-width: 1300px;
   height: 100%;
   min-height: 700px;
+  font-family: "VT323", monospace;
+}
+
+button {
+  background-color: rgba(0, 0, 0, 0);
+  color: var(--font-color);
+  font-family: "VT323", monospace;
+  border: none;
+  cursor: pointer;
+  font-size: 2rem;
+}
+
+.bg {
+  background-color: var(--background-color);
+  color: var(--background-font-color);
+  width: 100%;
+  height: 100%;
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -40,45 +55,8 @@ body {
   transform: translateY(-20%);
   transition: transform 0.5s ease-out;
 }
-
 .title.center {
   transform: translateY(0);
-}
-
-input[type=text]:focus {
-  outline: none;
-}
-
-button {
-  background-color: rgba(0, 0, 0, 0);
-  color: var(--font-color);
-  font-family: "VT323", monospace;
-  border: none;
-  cursor: pointer;
-  font-size: 2rem;
-}
-
-.glass_effect {
-  background: rgba(0, 0, 0, 0.49);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-.blur {
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
-
-.block-overlay {
-  position: absolute;
-  display: none;
-  width: 100%;
-  height: 100%;
-  z-index: 99;
-}
-
-.block-overlay.active {
-  display: block;
 }
 
 .version {
@@ -172,6 +150,8 @@ button {
   }
 }
 .game {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   position: relative;
   display: none;
   justify-content: center;
@@ -181,17 +161,18 @@ button {
   height: 100%;
   min-height: 700px;
 }
-
 .game.active {
   animation: floatIn 0.8s forwards ease-in-out;
   display: flex;
 }
-
 .game.inactive {
   animation: floatOut 0.5s forwards ease-in-out;
 }
 
 .player_info {
+  background: rgba(0, 0, 0, 0.49);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.1);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -204,12 +185,10 @@ button {
   font-family: "VT323", monospace;
   position: relative;
 }
-
 .player_info.left {
   border-radius: 25px 0px 0px 25px;
   right: -2px;
 }
-
 .player_info.right {
   border-radius: 0px 25px 25px 0px;
   left: -2px;
@@ -234,6 +213,9 @@ button {
 }
 
 .board {
+  background: rgba(0, 0, 0, 0.49);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.1);
   position: relative;
   height: clamp(700px, 90%, 900px);
   z-index: 10;
@@ -283,7 +265,6 @@ button {
   opacity: 0.3;
   cursor: pointer;
 }
-
 .reset:hover {
   opacity: 1;
 }
@@ -322,12 +303,10 @@ button {
   display: none;
   justify-content: center;
 }
-
 .turn-indicator span {
   position: absolute;
   bottom: 75px;
 }
-
 .turn-indicator.active {
   display: flex;
 }
@@ -335,15 +314,13 @@ button {
 .left .turn-indicator.active {
   animation: floatInRight 0.3s ease-out forwards;
 }
-
-.right .turn-indicator.active {
-  animation: floatInLeft 0.3s ease-out forwards;
-}
-
 .left .turn-indicator.inactive {
   animation: floatOutRight 0.3s ease-in forwards;
 }
 
+.right .turn-indicator.active {
+  animation: floatInLeft 0.3s ease-out forwards;
+}
 .right .turn-indicator.inactive {
   animation: floatOutLeft 0.3s ease-in forwards;
 }
@@ -352,7 +329,6 @@ button {
   display: flex;
   animation: fadeIn 0.4s ease-in forwards;
 }
-
 .player_info:hover .turn-indicator {
   animation: fadeOut 0.4s ease-in forwards;
 }
@@ -376,7 +352,6 @@ button {
   align-items: center;
   padding: 50px;
 }
-
 .cell.highlight {
   animation: cell 1s forwards;
 }
@@ -393,84 +368,115 @@ button {
   font-size: 13rem;
 }
 
-.start-menu {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
+@keyframes floatIn {
+  0% {
+    transform: translateY(300px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+@keyframes floatOut {
+  0% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(300px);
+    opacity: 0;
+  }
+}
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes floatOutLeft {
+  0% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+}
+@keyframes floatInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+}
+@keyframes floatOutRight {
+  0% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+}
+@keyframes floatInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+}
+@keyframes cell {
+  100% {
+    fill: var(--background-color);
+    background-color: var(--font-color);
+    border-color: var(--background-color);
+  }
+}
+.player-menu {
+  background: rgba(0, 0, 0, 0.49);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   align-items: center;
   justify-content: center;
-  top: 60%;
-}
-
-.start-menu.inactive {
+  width: clamp(900px, 50%, 1000px);
   display: none;
-}
-
-.start-menu button {
-  font-size: 2.5rem;
-  cursor: pointer;
-  display: block;
-  background-color: inherit;
-  border: none;
-  color: inherit;
-  font-family: "VT323", monospace;
-  margin-bottom: 20px;
-}
-
-.start-menu button:hover {
-  color: white;
-}
-
-.start-menu button:hover::before {
-  display: inline;
-}
-
-.start-menu button::before {
-  content: "> ";
-  display: none;
-}
-
-.player-menu {
   position: absolute;
   border-radius: 25px;
-  width: clamp(900px, 50%, 1000px);
-  align-items: center;
-  display: none;
-  justify-content: center;
-  flex-direction: column;
   padding: 40px;
   color: var(--font-color);
 }
-
 .player-menu.active {
   animation: floatIn 0.5s forwards ease-in;
   display: flex;
 }
-
 .player-menu.inactive {
   animation: floatOut 0.5s forwards ease-in;
 }
-
-.player-menu .alert {
-  color: red;
-  font-size: 1.3rem;
-  margin-bottom: 20px;
-}
-
-.singlePlayer {
-  /* todo */
-}
-
-.multiPlayer {
-  display: flex;
-  align-items: center;
-}
-
-.multiPlayer .versus {
+.player-menu .versus {
   font-size: 4rem;
 }
-
-.multiPlayer .player_section {
+.player_section {
   min-width: 400px;
   width: 50%;
   display: flex;
@@ -478,18 +484,15 @@ button {
   justify-content: center;
   flex-direction: column;
 }
-
-.multiPlayer h2 {
+.player_section h2 {
   font-size: 2rem;
   margin-bottom: 30px;
 }
-
-.multiPlayer h3 {
+.player_section h3 {
   font-size: 1.5rem;
   margin-bottom: 20px;
 }
-
-.multiPlayer input[type=text] {
+.player_section input[type=text] {
   width: clamp(200px, 30%, 40%);
   background-color: rgba(0, 0, 0, 0);
   border: none;
@@ -500,19 +503,23 @@ button {
   border-bottom: 2px solid var(--font-color);
   margin-bottom: 40px;
 }
-
-.token_container {
-  margin-bottom: 20px;
-  display: flex;
-  gap: 20px;
-}
-
-.multiPlayer input[type=radio] {
+.player_section input[type=radio] {
   position: absolute;
   cursor: pointer;
   opacity: 0;
   height: 0;
   width: 0;
+}
+.player_section .alert {
+  color: red;
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+}
+
+.token_container {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 20px;
 }
 
 .token_icon {
@@ -525,13 +532,11 @@ button {
   opacity: 0.5;
   cursor: pointer;
 }
-
-.token_icon path {
-  fill: var(--font-color);
-}
-
 .token_icon:hover {
   opacity: 1;
+}
+.token_icon path {
+  fill: var(--font-color);
 }
 
 input:checked ~ .token_icon {
@@ -551,7 +556,6 @@ input:checked ~ .token_icon path {
   display: none;
   align-items: center;
 }
-
 .result_container.active {
   display: flex;
 }
@@ -596,6 +600,146 @@ input:checked ~ .token_icon path {
 
 .winner_name {
   font-size: 5rem;
+}
+
+.start-menu {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  top: 20%;
+}
+.start-menu.active {
+  display: flex;
+}
+.start-menu.inactive {
+  display: none;
+}
+
+.start-menu button {
+  font-size: 2.5rem;
+  cursor: pointer;
+  display: block;
+  background-color: inherit;
+  border: none;
+  color: inherit;
+  font-family: "VT323", monospace;
+  margin-bottom: 20px;
+}
+.start-menu button:hover {
+  color: white;
+}
+.start-menu button:hover::before {
+  display: inline;
+}
+.start-menu button::before {
+  content: "> ";
+  display: none;
+}
+
+@keyframes floatIn {
+  0% {
+    transform: translateY(300px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+@keyframes floatOut {
+  0% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(300px);
+    opacity: 0;
+  }
+}
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes floatOutLeft {
+  0% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+}
+@keyframes floatInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+}
+@keyframes floatOutRight {
+  0% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+}
+@keyframes floatInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+}
+@keyframes cell {
+  100% {
+    fill: var(--background-color);
+    background-color: var(--font-color);
+    border-color: var(--background-color);
+  }
+}
+.game_container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 100%;
+  width: 100%;
+  color: var(--font-color);
+}
+
+.block-overlay {
+  position: absolute;
+  display: none;
+  width: 100%;
+  height: 100%;
+  z-index: 99;
+}
+.block-overlay.active {
+  display: block;
 }
 
 /*# sourceMappingURL=style.css.map */

@@ -1,0 +1,34 @@
+:root {
+    --primamry-color: red;
+    --secondary-color: blue;
+    --background-color: #1b1b1b;
+    --background-font-color: #acacac;
+    --font-color: white;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
+
+input[type="text"]:focus {
+    outline: none;
+}
+
+html,
+body {
+    width: 100%;
+    min-width: 1300px;
+    height: 100%;
+    min-height: 700px;
+    font-family: "VT323", monospace;
+}
+
+button {
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--font-color);
+    font-family: "VT323", monospace;
+    border: none;
+    cursor: pointer;
+    font-size: 2rem;
+}
