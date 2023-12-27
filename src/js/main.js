@@ -1,3 +1,7 @@
+const float_duration = 500;
+const fade_duration = 500;
+document.documentElement.style.setProperty("--fade-animation-duration", `${fade_duration}ms`);
+
 class Player {
     constructor() {
         this.name = "";
@@ -232,8 +236,6 @@ function GameController() {
 }
 
 function ScreenController() {
-    const endRoundDuration = 2000;
-
     const title = document.querySelector(".title");
     const startMenu = document.querySelector(".start-menu");
     const playerMenu = document.querySelector(".player-menu");
@@ -247,6 +249,8 @@ function ScreenController() {
     const endResult = document.querySelector(".result_container");
     const winResult = document.querySelector(".result--win");
     const tieResult = document.querySelector(".result--tie");
+    const resultOverlay = document.querySelector(".result_overlay");
+
     const winnerNameDisplay = document.querySelector(".winner_name");
 
     const game = GameController();
@@ -255,27 +259,18 @@ function ScreenController() {
 
     const showTitle = () => {
         title.classList.remove("center");
-        gameBoard.classList.add("inactive");
-        setTimeout(() => {
-            gameBoard.classList.remove("active");
-        }, 500);
-        startMenu.classList.remove("inactive");
-        playerMenu.classList.remove("inactive");
+        transitOut(gameBoard, 500);
+        transitIn(startMenu, 500);
     };
     const showPlayerMenu = () => {
         title.classList.add("center");
-        startMenu.classList.add("inactive");
-        playerMenu.classList.add("active");
+        transitOut(startMenu, 500);
+        transitIn(playerMenu, 500);
     };
     const showGame = () => {
         //display game area
-        playerMenu.classList.add("inactive");
-        setTimeout(() => {
-            playerMenu.classList.remove("active");
-        }, 500);
-
-        gameBoard.classList.remove("inactive");
-        gameBoard.classList.add("active");
+        transitOut(playerMenu, 500);
+        transitIn(gameBoard, 500);
 
         console.log("...starting the game");
         //display the player's title
@@ -297,6 +292,7 @@ function ScreenController() {
         tokenDisplays[1].innerText = "";
         tokenDisplays[1].appendChild(getIcon(game.getPlayers()[1].getToken().nodeValue));
     };
+
     const showWinner = (duration) => {
         let res = game.getCellChain();
         for (let i = 0; i < res.length; i++) {
@@ -323,6 +319,7 @@ function ScreenController() {
             }
         }
     };
+
     const clearBoard = () => {
         for (let x = 0; x < rows; ++x) {
             for (let y = 0; y < cols; ++y) {
@@ -412,6 +409,7 @@ function ScreenController() {
             }
         }
     };
+
     const updateCell = (x, y) => {
         getCells()[x][y].appendChild(getIcon(game.getActivePlayer().getToken().nodeValue));
     };
@@ -422,61 +420,62 @@ function ScreenController() {
         let iconValue = scores[lastestRound] == "" ? "draw" : scores[lastestRound].nodeValue;
         scoreBoard[lastestRound].appendChild(getIcon(iconValue));
     };
+
     const resetAll = () => {
+        //reset scoreboard UI
         for (let score of scoreBoard) {
             score.innerText = "";
         }
-
+        //reset cell UI
         for (let x = 0; x < rows; ++x) {
             for (let y = 0; y < cols; ++y) {
                 getCells()[x][y].innerText = "";
             }
         }
-
-        if (endResult.classList.contains("active")) {
-            endResult.classList.add("inactive");
-            setTimeout(() => {
-                endResult.classList.remove("inactive");
-                endResult.classList.remove("active");
-                winResult.classList.remove("active");
-                tieResult.classList.remove("active");
-            }, 1000);
-        } else {
-            endResult.classList.remove("active");
-            winResult.classList.remove("active");
-            tieResult.classList.remove("active");
+        //hide result
+        if (!endResult.classList.contains("inactive")) {
+            if (!winResult.classList.contains("inactive")) transitOut(winResult, 500);
+            if (!tieResult.classList.contains("inactive")) transitOut(tieResult, 500);
+            transitOut(resultOverlay, 500);
+            transitOut(endResult, 500);
         }
 
-        indicators[1].classList.remove("active");
-        indicators[1].classList.add("inactive");
+        //reset player's turn indicator
         indicators[0].classList.remove("inactive");
-        indicators[0].classList.add("active");
+        indicators[1].classList.add("inactive");
     };
+
     const moveIndicator = () => {
-        indicators[0].classList.toggle("inactive");
-        indicators[1].classList.toggle("inactive");
-        setTimeout(() => {
-            indicators[0].classList.toggle("active");
-            indicators[1].classList.toggle("active");
-        }, 300);
-    };
-    const showGameResult = () => {
-        endResult.classList.add("active");
-        if (game.getGameWinner() == false) {
-            tieResult.classList.add("active");
+        if (indicators[0].classList.contains("inactive")) {
+            transitOut(indicators[1], 200);
+            transitIn(indicators[0], 200, 100);
         } else {
-            winResult.classList.add("active");
-            winnerNameDisplay.innerText = game.getGameWinner();
+            transitOut(indicators[0], 200);
+            transitIn(indicators[1], 200, 100);
         }
     };
+
+    const showGameResult = () => {
+        transitIn(endResult, 500);
+        transitIn(resultOverlay, 500);
+
+        if (game.getGameWinner()) {
+            transitIn(winResult, 500);
+            winnerNameDisplay.innerText = game.getGameWinner();
+        } else {
+            transitIn(tieResult, 500);
+        }
+    };
+
     const startMenuEventHandler = (function () {
         const gameModeOpts = document.querySelectorAll(".start-menu > button");
         gameModeOpts[0].addEventListener("click", (e) => {
+            //todo
             window.alert("Game mode currently in development");
         });
 
         gameModeOpts[1].addEventListener("click", (e) => {
-            e.target === gameModeOpts[0] ? game.setGameMode("pve") : game.setGameMode("pvp");
+            game.setGameMode("pvp");
             showPlayerMenu();
         });
     })();
@@ -589,3 +588,30 @@ function ScreenController() {
 }
 
 ScreenController();
+
+async function transitIn(el, duration, delay = 0) {
+    document.documentElement.style.setProperty("--animation-duration", `${duration}ms`);
+
+    await new Promise((resolve) => setTimeout(resolve, delay));
+    el.classList.toggle("inactive");
+    //play the animation
+    el.classList.add("moveIn");
+    //wait
+    await new Promise((resolve) => setTimeout(resolve, duration));
+    //and then remove the animation class and toggle the active state
+    el.classList.remove("moveIn");
+}
+
+async function transitOut(el, duration, delay = 0) {
+    document.documentElement.style.setProperty("--animation-duration", `${duration}ms`);
+
+    await new Promise((resolve) => setTimeout(resolve, delay));
+    //play the animation
+    el.classList.add("moveOut");
+    //wait
+    await new Promise((resolve) => setTimeout(resolve, duration));
+    //and then remove the animation class and toggle the active state
+    el.classList.remove("moveOut");
+
+    el.classList.toggle("inactive");
+}

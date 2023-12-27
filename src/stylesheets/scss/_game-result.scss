@@ -1,26 +1,41 @@
+@import "./utilities/animations";
+@import "./utilities/mixins";
+
 .result_container {
+    top: 0;
     position: absolute;
     z-index: 99;
     height: 100%;
     width: 100%;
-    display: none;
+    display: flex;
     align-items: center;
 
-    &.active {
-        display: flex;
+    &.inactive {
+        display: none;
     }
 }
 
 .result_overlay {
-    animation: fadeIn 1s forwards ease-in;
     position: absolute;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    opacity: 0.6;
+    background-color: rgba(0, 0, 0, 0.3);
+
+    &.inactive {
+        display: none;
+    }
+    &.moveIn {
+        animation: fadeIn var(--animation-duration) forwards ease-in;
+    }
+    &.moveOut {
+        animation: fadeOut var(--animation-duration) forwards ease-in-out;
+    }
 }
 
 .result {
+    @include glass_effect;
+    @include blur_effect;
+
     box-sizing: border-box;
     border-left: none;
     border-right: none;
@@ -28,27 +43,18 @@
     width: 100%;
     padding: 50px;
     font-size: 2.5rem;
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    animation: fadeIn 1s forwards ease-in;
-}
 
-.inactive .result,
-.inactive .result_overlay {
-    animation: fadeOut 0.5s forwards ease-in-out;
-}
-
-.result--win.active {
-    display: flex;
-}
-
-.result--tie.active {
-    display: flex;
-    font-size: 5rem;
-}
-
-.winner_name {
-    font-size: 5rem;
+    &.moveIn {
+        animation: fadeIn var(--animation-duration) forwards ease-in;
+    }
+    &.moveOut {
+        animation: fadeOut var(--animation-duration) forwards ease-in-out;
+    }
+    &.inactive {
+        display: none;
+    }
 }

@@ -5,23 +5,24 @@
     @include glass_effect;
     @include blur_effect;
 
+    display: flex;
     align-items: center;
     justify-content: center;
-    width: clamp(900px, 50%, 1000px);
-    display: none;
 
     position: absolute;
+    width: clamp(900px, 50%, 1000px);
     border-radius: 25px;
     padding: 40px;
     color: var(--font-color);
 
-    &.active {
-        animation: floatIn 0.5s forwards ease-in;
-        display: flex;
+    &.moveIn {
+        animation: floatIn var(--animation-duration) forwards ease-in;
     }
-
+    &.moveOut {
+        animation: floatOut var(--animation-duration) forwards ease-in;
+    }
     &.inactive {
-        animation: floatOut 0.5s forwards ease-in;
+        display: none;
     }
 
     .versus {

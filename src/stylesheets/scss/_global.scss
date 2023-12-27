@@ -4,6 +4,8 @@
     --background-color: #1b1b1b;
     --background-font-color: #acacac;
     --font-color: white;
+
+    --animation-duration: 0;
 }
 
 * {
@@ -22,6 +24,8 @@ body {
     height: 100%;
     min-height: 700px;
     font-family: "VT323", monospace;
+    position: relative;
+    color: var(--font-color);
 }
 
 button {

@@ -4,8 +4,9 @@
 .game {
     @include blur_effect;
 
-    position: relative;
-    display: none;
+    position: absolute;
+    display: flex;
+
     justify-content: center;
     align-items: center;
     width: 100%;
@@ -13,13 +14,16 @@
     height: 100%;
     min-height: 700px;
 
-    &.active {
-        animation: floatIn 0.8s forwards ease-in-out;
-        display: flex;
+    &.moveIn {
+        animation: floatIn var(--animation-duration) forwards ease-in-out;
+    }
+
+    &.moveOut {
+        animation: floatOut var(--animation-duration) forwards ease-in-out;
     }
 
     &.inactive {
-        animation: floatOut 0.5s forwards ease-in-out;
+        display: none;
     }
 }
 
@@ -154,7 +158,7 @@
     top: -55px;
     font-size: 1.5rem;
     white-space: nowrap;
-    display: none;
+    display: flex;
     justify-content: center;
 
     span {
@@ -162,26 +166,26 @@
         bottom: 75px;
     }
 
-    &.active {
-        display: flex;
+    &.inactive {
+        display: none;
     }
 }
 
 .left .turn-indicator {
-    &.active {
-        animation: floatInRight 0.3s ease-out forwards;
+    &.moveIn {
+        animation: floatInRight var(--animation-duration) ease-out forwards;
     }
-    &.inactive {
-        animation: floatOutRight 0.3s ease-in forwards;
+    &.moveOut {
+        animation: floatOutRight var(--animation-duration) ease-in forwards;
     }
 }
 
 .right .turn-indicator {
-    &.active {
-        animation: floatInLeft 0.3s ease-out forwards;
+    &.moveIn {
+        animation: floatInLeft var(--animation-duration) ease-out forwards;
     }
-    &.inactive {
-        animation: floatOutLeft 0.3s ease-in forwards;
+    &.moveOut {
+        animation: floatOutLeft var(--animation-duration) ease-in forwards;
     }
 }
 

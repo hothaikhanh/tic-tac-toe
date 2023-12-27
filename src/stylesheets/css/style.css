@@ -4,6 +4,7 @@
   --background-color: #1b1b1b;
   --background-font-color: #acacac;
   --font-color: white;
+  --animation-duration: 0;
 }
 
 * {
@@ -22,6 +23,8 @@ body {
   height: 100%;
   min-height: 700px;
   font-family: "VT323", monospace;
+  position: relative;
+  color: var(--font-color);
 }
 
 button {
@@ -152,8 +155,8 @@ button {
 .game {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  position: relative;
-  display: none;
+  position: absolute;
+  display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
@@ -161,12 +164,14 @@ button {
   height: 100%;
   min-height: 700px;
 }
-.game.active {
-  animation: floatIn 0.8s forwards ease-in-out;
-  display: flex;
+.game.moveIn {
+  animation: floatIn var(--animation-duration) forwards ease-in-out;
+}
+.game.moveOut {
+  animation: floatOut var(--animation-duration) forwards ease-in-out;
 }
 .game.inactive {
-  animation: floatOut 0.5s forwards ease-in-out;
+  display: none;
 }
 
 .player_info {
@@ -300,29 +305,29 @@ button {
   top: -55px;
   font-size: 1.5rem;
   white-space: nowrap;
-  display: none;
+  display: flex;
   justify-content: center;
 }
 .turn-indicator span {
   position: absolute;
   bottom: 75px;
 }
-.turn-indicator.active {
-  display: flex;
+.turn-indicator.inactive {
+  display: none;
 }
 
-.left .turn-indicator.active {
-  animation: floatInRight 0.3s ease-out forwards;
+.left .turn-indicator.moveIn {
+  animation: floatInRight var(--animation-duration) ease-out forwards;
 }
-.left .turn-indicator.inactive {
-  animation: floatOutRight 0.3s ease-in forwards;
+.left .turn-indicator.moveOut {
+  animation: floatOutRight var(--animation-duration) ease-in forwards;
 }
 
-.right .turn-indicator.active {
-  animation: floatInLeft 0.3s ease-out forwards;
+.right .turn-indicator.moveIn {
+  animation: floatInLeft var(--animation-duration) ease-out forwards;
 }
-.right .turn-indicator.inactive {
-  animation: floatOutLeft 0.3s ease-in forwards;
+.right .turn-indicator.moveOut {
+  animation: floatOutLeft var(--animation-duration) ease-in forwards;
 }
 
 .player_info:hover .ff {
@@ -457,21 +462,23 @@ button {
   border: 2px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: clamp(900px, 50%, 1000px);
-  display: none;
   position: absolute;
+  width: clamp(900px, 50%, 1000px);
   border-radius: 25px;
   padding: 40px;
   color: var(--font-color);
 }
-.player-menu.active {
-  animation: floatIn 0.5s forwards ease-in;
-  display: flex;
+.player-menu.moveIn {
+  animation: floatIn var(--animation-duration) forwards ease-in;
+}
+.player-menu.moveOut {
+  animation: floatOut var(--animation-duration) forwards ease-in;
 }
 .player-menu.inactive {
-  animation: floatOut 0.5s forwards ease-in;
+  display: none;
 }
 .player-menu .versus {
   font-size: 4rem;
@@ -548,28 +555,124 @@ input:checked ~ .token_icon path {
   fill: black;
 }
 
+@keyframes floatIn {
+  0% {
+    transform: translateY(300px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+@keyframes floatOut {
+  0% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(300px);
+    opacity: 0;
+  }
+}
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes floatOutLeft {
+  0% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+}
+@keyframes floatInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+}
+@keyframes floatOutRight {
+  0% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+}
+@keyframes floatInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+}
+@keyframes cell {
+  100% {
+    fill: var(--background-color);
+    background-color: var(--font-color);
+    border-color: var(--background-color);
+  }
+}
 .result_container {
+  top: 0;
   position: absolute;
   z-index: 99;
   height: 100%;
   width: 100%;
-  display: none;
+  display: flex;
   align-items: center;
 }
-.result_container.active {
-  display: flex;
+.result_container.inactive {
+  display: none;
 }
 
 .result_overlay {
-  animation: fadeIn 1s forwards ease-in;
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  opacity: 0.6;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.result_overlay.inactive {
+  display: none;
+}
+.result_overlay.moveIn {
+  animation: fadeIn var(--animation-duration) forwards ease-in;
+}
+.result_overlay.moveOut {
+  animation: fadeOut var(--animation-duration) forwards ease-in-out;
 }
 
 .result {
+  background: rgba(0, 0, 0, 0.49);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   box-sizing: border-box;
   border-left: none;
   border-right: none;
@@ -577,41 +680,34 @@ input:checked ~ .token_icon path {
   width: 100%;
   padding: 50px;
   font-size: 2.5rem;
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  animation: fadeIn 1s forwards ease-in;
 }
-
-.inactive .result,
-.inactive .result_overlay {
-  animation: fadeOut 0.5s forwards ease-in-out;
+.result.moveIn {
+  animation: fadeIn var(--animation-duration) forwards ease-in;
 }
-
-.result--win.active {
-  display: flex;
+.result.moveOut {
+  animation: fadeOut var(--animation-duration) forwards ease-in-out;
 }
-
-.result--tie.active {
-  display: flex;
-  font-size: 5rem;
-}
-
-.winner_name {
-  font-size: 5rem;
+.result.inactive {
+  display: none;
 }
 
 .start-menu {
   display: flex;
-  position: relative;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  top: 20%;
+  position: absolute;
+  top: 60%;
 }
-.start-menu.active {
-  display: flex;
+.start-menu.moveIn {
+  animation: fadeIn var(--animation-duration) forwards ease-in;
+}
+.start-menu.moveOut {
+  animation: fadeOut var(--animation-duration) forwards ease-in;
 }
 .start-menu.inactive {
   display: none;
@@ -728,7 +824,7 @@ input:checked ~ .token_icon path {
   position: relative;
   height: 100%;
   width: 100%;
-  color: var(--font-color);
+  overflow: hidden;
 }
 
 .block-overlay {
