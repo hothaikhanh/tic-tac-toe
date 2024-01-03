@@ -17,7 +17,6 @@ class Player {
         this.tokenID = value;
     };
 }
-
 function Board() {
     const board = [];
     const columns = COL;
@@ -39,7 +38,6 @@ function Board() {
 
     return { getColumn, getRow, getBoard, setBoard };
 }
-
 function Cell() {
     let value = new String();
 
@@ -54,7 +52,6 @@ function Cell() {
         getVal,
     };
 }
-
 function PlayerController() {
     const player1 = new Player();
     const player2 = new Player();
@@ -67,7 +64,6 @@ function PlayerController() {
 
     return { getAll, getActive, switchActive, setActive };
 }
-
 function ScoreController() {
     let score = [];
     const set = (value) => (score = value);
@@ -75,14 +71,12 @@ function ScoreController() {
     const get = () => score;
     return { set, get, add };
 }
-
 function ModeController() {
     let gameMode = "";
     const get = () => gameMode;
     const set = (mode) => (gameMode = mode);
     return { get, set };
 }
-
 function ChainController() {
     let chain = [];
     const get = () => chain;
@@ -113,9 +107,9 @@ function GameController() {
         if (board.getBoard()[x][y].getVal() != "") return false;
         return true;
     };
-    const checkWin = (x, y) => {
-        const _board = board.getBoard();
-        tokenID = _board[x][y].getVal();
+    const checkWin = (x, y, tokenID) => {
+        const currentBoard = board.getBoard();
+        if (!tokenID) tokenID = currentBoard[x][y].getVal();
         let chainsRecord = {
             hori: [[x, y]],
             vert: [[x, y]],
@@ -143,23 +137,23 @@ function GameController() {
             // | ${cellState.lowerLeft} | ${cellState.below} | ${cellState.lowerRight} |`);
 
             // console.log("check vertical");
-            if (cellState.right && _board[x + i][y].getVal() == tokenID) chainsRecord.hori.push([x + i, y]);
-            if (cellState.left && _board[x - i][y].getVal() == tokenID) chainsRecord.hori.push([x - i, y]);
+            if (cellState.right && currentBoard[x + i][y].getVal() == tokenID) chainsRecord.hori.push([x + i, y]);
+            if (cellState.left && currentBoard[x - i][y].getVal() == tokenID) chainsRecord.hori.push([x - i, y]);
 
             // console.log("check horizontal");
-            if (cellState.below && _board[x][y + i].getVal() == tokenID) chainsRecord.vert.push([x, y + i]);
-            if (cellState.above && _board[x][y - i].getVal() == tokenID) chainsRecord.vert.push([x, y - i]);
+            if (cellState.below && currentBoard[x][y + i].getVal() == tokenID) chainsRecord.vert.push([x, y + i]);
+            if (cellState.above && currentBoard[x][y - i].getVal() == tokenID) chainsRecord.vert.push([x, y - i]);
 
             // console.log("check diagonal_1");
-            if (cellState.upperLeft && _board[x - i][y - i].getVal() == tokenID)
+            if (cellState.upperLeft && currentBoard[x - i][y - i].getVal() == tokenID)
                 chainsRecord.diag_1.push([x - i, y - i]);
-            if (cellState.lowerRight && _board[x + i][y + i].getVal() == tokenID)
+            if (cellState.lowerRight && currentBoard[x + i][y + i].getVal() == tokenID)
                 chainsRecord.diag_1.push([x + i, y + i]);
 
             // console.log("check diagonal_2");
-            if (cellState.lowerLeft && _board[x - i][y + i].getVal() == tokenID)
+            if (cellState.lowerLeft && currentBoard[x - i][y + i].getVal() == tokenID)
                 chainsRecord.diag_2.push([x - i, y + i]);
-            if (cellState.upperRight && _board[x + i][y - i].getVal() == tokenID)
+            if (cellState.upperRight && currentBoard[x + i][y - i].getVal() == tokenID)
                 chainsRecord.diag_2.push([x + i, y - i]);
         }
 
@@ -214,50 +208,6 @@ function GameController() {
         players.setActive(player1);
         setNewBoard();
     };
-
-    const Bot = () => {
-        // let hasPlayed = false;
-        // const optimalMove = [];
-        // const setOptimalMove = () => {
-        //     hasPlayed = true;
-        //     switch (checkLastMove()) {
-        //         case "first":
-        //             //set optimal move to corner
-        //             break;
-        //         case "second":
-        //             //set optimal move to blocking the first move
-        //             break;
-        //         case "none":
-        //             //set optimal move if check for loss is true
-        //             //else set optimal move if check for win is true
-        //             //else play random
-        //             break;
-        //     }
-        // };
-        // const getOptimalMove = () => optimalMove;
-        // const checkLastMove = () => {
-        //     let { cordinate_x: x, cordinate_y: y, tokenID } = getLatestMove();
-        //     console.log("checking for last move");
-        //     console.log(getLatestMove());
-        //     if (getLatestMove()) {
-        //         console.log("first move has not been played");
-        //     } else if (getLatestMove().cordinate_x && getLatestMove().cordinate_y && !hasPlayed) {
-        //         console.log("first move has been played");
-        //     } else if (hasPlayed) {
-        //         console.log("second move has been played");
-        //     }
-        // };
-        // const checkForLoss = () => {};
-        // const checkForWin = () => {};
-        // return {
-        //     checkLastMove,
-        //     checkForLoss,
-        //     checkForWin,
-        //     setOptimalMove,
-        //     getOptimalMove,
-        // };
-    };
-
     return {
         players,
         scores,
@@ -275,7 +225,6 @@ function GameController() {
         getBoard: board.getBoard,
     };
 }
-
 function ScreenController() {
     const title = document.querySelector(".title");
     const startMenu = document.querySelector(".start-menu");
@@ -434,6 +383,154 @@ function ScreenController() {
     };
 }
 
+function BotController(game) {
+    const rows = ROW;
+    const cols = COL;
+    const [humanTokenID, botTokenID] = game.players.getAll();
+    let emptyCells = {};
+    let filledCells = {};
+    let optimalMove = "";
+
+    const setUp = () => {
+        emptyCells = {
+            corner: ["0,0", "2,0", "0,2", "2,2"],
+            edge: ["0,1", "1,0", "2,1", "1,2"],
+            center: ["1,1"],
+        };
+
+        filledCells = {
+            human: [],
+            bot: [],
+        };
+    };
+
+    const recordHumanMove = (x, y) => {
+        let value = `${x},${y}`;
+        filledCells.human.push(value);
+        for (const area in emptyCells) {
+            if (emptyCells[area].includes(value)) {
+                emptyCells[area].splice(emptyCells[area].indexOf(value), 1);
+            }
+        }
+    };
+    const recordBotMove = (x, y) => {
+        let value = `${x},${y}`;
+        filledCells.bot.push(value);
+        for (const area in emptyCells) {
+            if (emptyCells[area].includes(value)) {
+                emptyCells[area].splice(emptyCells[area].indexOf(value), 1);
+            }
+        }
+    };
+    const getOptimalMove = () => {
+        console.log(`human has played: ${filledCells.human}\nbot has played: ${filledCells.bot}`);
+        switch (filledCells.human.length + filledCells.bot.length) {
+            case 0:
+                console.log("no moves has been played");
+                optimalMove = emptyCells.corner[Math.floor(Math.random() * emptyCells.corner.length)];
+                break;
+            case 1:
+                console.log("1 move has been played");
+                //set optimal move to counter the first move
+                if (emptyCells.center.length == 0) {
+                    optimalMove = emptyCells.corner[Math.floor(Math.random() * emptyCells.corner.length)];
+                } else {
+                    optimalMove = emptyCells.center[0];
+                }
+                break;
+            default:
+                console.log("bot is in default mode");
+                if (getWinningMove()) {
+                    //set optimal move if check for win is true
+                    console.log("bot is checking for win");
+                    optimalMove = getWinningMove();
+                    break;
+                } else if (getCounterMove()) {
+                    //else set optimal move if check for loss is true
+                    console.log("bot is checking for counter");
+                    optimalMove = getCounterMove();
+                    break;
+                } else if (getForkMove()) {
+                    //else check if there is a posible fork
+                    console.log("bot is looking for fork");
+                    optimalMove = getForkMove();
+                    break;
+                } else if (getCounterForkMove()) {
+                    //else check if human has a posible fork move
+                    console.log("bot is countering fork");
+                    optimalMove = getCounterForkMove();
+                    break;
+                } else if (emptyCells.center.length > 0) {
+                    //play the center
+                    console.log("bot is playing center");
+                    optimalMove = emptyCells.center[0];
+                } else if (emptyCells.corner.length > 0) {
+                    //play an opposite corner of a human corner's move or a random corner
+                    console.log("bot is playing corner");
+                    if (getOppositeCorner()) {
+                        console.log("playing opposite corner");
+                        optimalMove = getOppositeCorner();
+                        break;
+                    } else {
+                        console.log("playing random corner");
+                        optimalMove = emptyCells.corner[Math.floor(Math.random() * emptyCells.corner.length)];
+                        break;
+                    }
+                } else if (emptyCells.edge.length > 0) {
+                    //play random edge
+                    console.log("bot is playing edge");
+                    optimalMove = emptyCells.edge[Math.floor(Math.random() * emptyCells.edge.length)];
+                    break;
+                }
+                break;
+        }
+
+        return optimalMove.split(",").map(Number);
+    };
+
+    const getWinningMove = () => {
+        if (filledCells.human.length + filledCells.bot.length < 3) return false;
+        let totalEmptyCells = emptyCells.corner.concat(emptyCells.edge);
+        console.log(totalEmptyCells);
+        for (const cell of totalEmptyCells) {
+            let cellValue = cell.split(",").map(Number);
+            if (game.checkWin(cellValue[0], cellValue[1], botTokenID)) {
+                return cell;
+            }
+        }
+        return false;
+    };
+    const getCounterMove = () => {};
+    const getForkMove = () => {};
+    const getCounterForkMove = () => {};
+    const getOppositeCorner = () => {
+        let oppositeCorner = false;
+        corners = {
+            a: ["0,0", "2,2"],
+            b: ["0,2", "2,0"],
+        };
+
+        for (const pair in corners) {
+            for (let i = 0; i < 2; i++) {
+                let j = i == 0 ? 1 : 0;
+                if (filledCells.human.includes(pair[i]) && emptyCells.corner.includes(pair[j])) {
+                    oppositeCorner = pair[j];
+                }
+            }
+        }
+
+        return oppositeCorner;
+    };
+
+    return {
+        setUp,
+        recordHumanMove,
+        recordBotMove,
+        getOptimalMove,
+    };
+}
+
+//utilities functions
 async function transitIn(el, duration, delay = 0) {
     document.documentElement.style.setProperty("--animation-duration", `${duration}ms`);
     await wait(delay);
@@ -442,7 +539,6 @@ async function transitIn(el, duration, delay = 0) {
     await wait(duration);
     el.classList.remove("moveIn");
 }
-
 async function transitOut(el, duration, delay = 0) {
     document.documentElement.style.setProperty("--animation-duration", `${duration}ms`);
     await wait(delay);
@@ -451,12 +547,9 @@ async function transitOut(el, duration, delay = 0) {
     el.classList.remove("moveOut");
     el.classList.toggle("inactive");
 }
-
 function wait(duration) {
     return new Promise((resolve) => setTimeout(resolve, duration));
 }
-
-//utilities functions
 const getIcon = (tokenID) => {
     let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
@@ -527,7 +620,7 @@ const getCells = (cordinate_x, cordinate_y) => {
     for (let x = 0; x < cells.length; ++x) {
         cells[x] = new Array(0);
         for (let y = 0; y < cols; ++y) {
-            let cell_selector = `.cell[y="${y}"][x="${x}"]`;
+            let cell_selector = `.cell[x="${x}"][y="${y}"]`;
             cells[x].push(document.querySelector(cell_selector));
         }
     }
@@ -540,6 +633,7 @@ function app() {
     const cols = COL;
     const game = GameController();
     const screen = ScreenController();
+    const bot = BotController(game);
 
     const evalMove = (x, y) => {
         let roundEnd = game.checkDraw() || game.checkWin(x, y) ? true : false;
@@ -553,6 +647,9 @@ function app() {
     };
     const renderMove = (x, y) => {
         game.play(x, y);
+        if (game.mode.get() == "pve") {
+            game.players.getActive() == game.players.getAll()[0] ? bot.recordHumanMove(x, y) : bot.recordBotMove(x, y);
+        }
         screen.updateBoard(game.getBoard());
     };
     const renderScore = (roundWinner) => {
@@ -570,10 +667,26 @@ function app() {
     const renderNewRound = () => {
         game.setNewBoard();
         screen.updateBoard(game.getBoard());
+        if (game.mode.get() == "pve") {
+            console.log("a new bot has been created");
+            bot.setUp();
+        }
     };
     const switchActivePlayer = () => {
         game.players.switchActive();
         screen.moveIndicator();
+        //if p2 turn and pve, play bot
+        if (game.mode.get() == "pve" && game.players.getActive() !== game.players.getAll()[0]) {
+            console.log("it's now the bot's turn to make a move");
+            botPlay();
+        }
+    };
+
+    const botPlay = async () => {
+        screen.blockScreen(1000);
+        let [x, y] = bot.getOptimalMove();
+        // renderMove(x, y);
+        console.log(`bot is going to play: ${x} ${y}`);
     };
 
     //event handler
@@ -621,15 +734,17 @@ function app() {
 
             //IF PVP, check if the submit conditions from both player's form are met
             if (game.mode.get() == "pvp" && submitCondition[0] == true && submitCondition[1] == true) {
-                game.setNewBoard();
                 screen.setPlayerInfo(game.mode.get(), game.players.getAll());
+                renderNewRound();
                 screen.showGame();
             }
 
             //IF PVE, check if the submit conditions from both player's form are met
             if (game.mode.get() == "pve" && submitCondition[0] == true) {
+                screen.setPlayerInfo(game.mode.get(), game.players.getAll()); //temp
+
+                renderNewRound();
                 screen.showGame();
-                game.setNewBoard();
             }
         });
     };
@@ -690,14 +805,6 @@ function app() {
             });
         }
     };
-
-    //bot
-    // const botPlay = async () => {
-    //     blockScreen(2000);
-    //     currentBot.setOptimalMove();
-    //     let move = currentBot.getOptimalMove();
-    //     console.log(move);
-    // };
 
     (function startGame() {
         startMenuHandler();
