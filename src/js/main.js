@@ -386,7 +386,9 @@ function ScreenController() {
 function BotController(game) {
     const rows = ROW;
     const cols = COL;
-    const [humanTokenID, botTokenID] = game.players.getAll();
+
+    let humanTokenID = "";
+    let botTokenID = "";
     let emptyCells = {};
     let filledCells = {};
     let optimalMove = "";
@@ -401,7 +403,12 @@ function BotController(game) {
         filledCells = {
             human: [],
             bot: [],
+            total: function () {
+                return this.human.concat(this.bot);
+            },
         };
+        humanTokenID = game.players.getAll()[0].getToken();
+        botTokenID = game.players.getAll()[1].getToken();
     };
 
     const recordHumanMove = (x, y) => {
@@ -423,14 +430,12 @@ function BotController(game) {
         }
     };
     const getOptimalMove = () => {
-        console.log(`human has played: ${filledCells.human}\nbot has played: ${filledCells.bot}`);
+        console.log(`RECORD:\n__human has played: ${filledCells.human}\n__bot has played: ${filledCells.bot}`);
         switch (filledCells.human.length + filledCells.bot.length) {
             case 0:
-                console.log("no moves has been played");
                 optimalMove = emptyCells.corner[Math.floor(Math.random() * emptyCells.corner.length)];
                 break;
             case 1:
-                console.log("1 move has been played");
                 //set optimal move to counter the first move
                 if (emptyCells.center.length == 0) {
                     optimalMove = emptyCells.corner[Math.floor(Math.random() * emptyCells.corner.length)];
@@ -439,72 +444,140 @@ function BotController(game) {
                 }
                 break;
             default:
-                console.log("bot is in default mode");
-                if (getWinningMove()) {
+                if (filledCells.bot.length >= 2 && checkForWinningMove(botTokenID)) {
                     //set optimal move if check for win is true
-                    console.log("bot is checking for win");
-                    optimalMove = getWinningMove();
+                    console.log("BOT: found win move");
+                    optimalMove = checkForWinningMove(botTokenID);
                     break;
-                } else if (getCounterMove()) {
+                } else if (filledCells.human.length >= 2 && checkForWinningMove(humanTokenID)) {
                     //else set optimal move if check for loss is true
-                    console.log("bot is checking for counter");
-                    optimalMove = getCounterMove();
+                    console.log("BOT: found win counter");
+                    optimalMove = checkForWinningMove(humanTokenID);
                     break;
-                } else if (getForkMove()) {
+                } else if (filledCells.bot.length >= 2 && checkForFork(botTokenID)) {
                     //else check if there is a posible fork
-                    console.log("bot is looking for fork");
-                    optimalMove = getForkMove();
+                    console.log("BOT: found fork move");
+                    optimalMove = checkForFork(botTokenID);
                     break;
-                } else if (getCounterForkMove()) {
+                } else if (filledCells.human.length >= 2 && checkForFork(humanTokenID)) {
                     //else check if human has a posible fork move
-                    console.log("bot is countering fork");
-                    optimalMove = getCounterForkMove();
+                    console.log("BOT: found fork counter");
+                    optimalMove = checkForFork(humanTokenID);
+
                     break;
                 } else if (emptyCells.center.length > 0) {
                     //play the center
-                    console.log("bot is playing center");
+                    console.log("BOT: found empty center");
                     optimalMove = emptyCells.center[0];
                 } else if (emptyCells.corner.length > 0) {
                     //play an opposite corner of a human corner's move or a random corner
-                    console.log("bot is playing corner");
+                    console.log("BOT: found empty corner");
                     if (getOppositeCorner()) {
-                        console.log("playing opposite corner");
+                        console.log("--CORNER: opposite");
                         optimalMove = getOppositeCorner();
                         break;
                     } else {
-                        console.log("playing random corner");
+                        console.log("--CORNER: random");
                         optimalMove = emptyCells.corner[Math.floor(Math.random() * emptyCells.corner.length)];
                         break;
                     }
                 } else if (emptyCells.edge.length > 0) {
                     //play random edge
-                    console.log("bot is playing edge");
+                    console.log("BOT: found empty edge");
                     optimalMove = emptyCells.edge[Math.floor(Math.random() * emptyCells.edge.length)];
                     break;
                 }
                 break;
         }
-
         return optimalMove.split(",").map(Number);
     };
 
-    const getWinningMove = () => {
-        if (filledCells.human.length + filledCells.bot.length < 3) return false;
+    const checkForWinningMove = (tokenID) => {
         let totalEmptyCells = emptyCells.corner.concat(emptyCells.edge);
-        console.log(totalEmptyCells);
         for (const cell of totalEmptyCells) {
             let cellValue = cell.split(",").map(Number);
-            if (game.checkWin(cellValue[0], cellValue[1], botTokenID)) {
+            if (game.checkWin(cellValue[0], cellValue[1], tokenID)) {
                 return cell;
             }
         }
+        console.log("found no winning move for: " + tokenID.value);
         return false;
     };
-    const getCounterMove = () => {};
-    const getForkMove = () => {};
-    const getCounterForkMove = () => {};
+
+    const checkForFork = (tokenID) => {
+        let sides = {
+            top: {
+                cells: ["0,0", "1,0", "2,0"],
+                viable: false,
+                unviable: false,
+                mid: false,
+            },
+            bottom: {
+                cells: ["0,2", "1,2", "2,2"],
+                viable: false,
+                unviable: false,
+                mid: false,
+            },
+            left: {
+                cells: ["0,0", "0,1", "0,2"],
+                viable: false,
+                unviable: false,
+                mid: false,
+            },
+            right: {
+                cells: ["2,0", "2,1", "2,2"],
+                viable: false,
+                unviable: false,
+                mid: false,
+            },
+        };
+        let forkSides = [];
+        let movePlayed = tokenID == humanTokenID ? filledCells.human : filledCells.bot;
+        let moveOpponentPlayed = tokenID == humanTokenID ? filledCells.bot : filledCells.human;
+
+        //get available sides
+        for (const direction in sides) {
+            for (const cell of sides[direction].cells) {
+                if (movePlayed.includes(cell)) {
+                    sides[direction].viable = true;
+                    if (cell.includes("1")) sides[direction].mid = true;
+                }
+                if (moveOpponentPlayed.includes(cell)) {
+                    sides[direction].unviable = true;
+                }
+            }
+            if (!sides[direction].viable || sides[direction].unviable) delete sides[direction];
+        }
+
+        //if bottom and top OR left and right are not viable then quit
+        if ((!sides.top && !sides.bottom) || (!sides.right && !sides.left)) return false;
+
+        //get the first side
+        if (sides.top || sides.bottom) forkSides[0] = sides.top ? sides.top : sides.bottom;
+        if (sides.top && sides.bottom) {
+            if (sides.top.mid) forkSides[0] = sides.top;
+            if (sides.bottom.mid) forkSides[0] = sides.bottom;
+        }
+        //get the second side
+        if (sides.left || sides.right) forkSides[1] = sides.left ? sides.left : sides.right;
+        if (sides.left && sides.right) {
+            if (sides.left.mid) forkSides[1] = sides.left;
+            if (sides.right.mid) forkSides[1] = sides.right;
+        }
+        //get the current position of the viable moves
+        let posibleMove = forkSides[0].cells.concat(forkSides[1].cells);
+        let head = forkSides[0].cells.filter((element) => forkSides[1].cells.includes(element));
+        let mid = posibleMove.filter((element) => element.includes("1"));
+        //return the fork move
+        if (!forkSides[0].mid && !forkSides[1].mid) {
+            return mid[0];
+        } else if (forkSides[0].mid || forkSides[1].mid) {
+            return head[0];
+        }
+        return false;
+    };
+
     const getOppositeCorner = () => {
-        let oppositeCorner = false;
         corners = {
             a: ["0,0", "2,2"],
             b: ["0,2", "2,0"],
@@ -513,13 +586,13 @@ function BotController(game) {
         for (const pair in corners) {
             for (let i = 0; i < 2; i++) {
                 let j = i == 0 ? 1 : 0;
-                if (filledCells.human.includes(pair[i]) && emptyCells.corner.includes(pair[j])) {
-                    oppositeCorner = pair[j];
+                if (filledCells.total().includes(corners[pair][i]) && emptyCells.corner.includes(corners[pair][j])) {
+                    return corners[pair][j];
                 }
             }
         }
 
-        return oppositeCorner;
+        return false;
     };
 
     return {
@@ -677,16 +750,31 @@ function app() {
         screen.moveIndicator();
         //if p2 turn and pve, play bot
         if (game.mode.get() == "pve" && game.players.getActive() !== game.players.getAll()[0]) {
-            console.log("it's now the bot's turn to make a move");
+            console.log("BOT TURN:");
             botPlay();
         }
     };
 
     const botPlay = async () => {
-        screen.blockScreen(1000);
+        screen.blockScreen(500);
+        await wait(500);
         let [x, y] = bot.getOptimalMove();
-        // renderMove(x, y);
-        console.log(`bot is going to play: ${x} ${y}`);
+        renderMove(x, y);
+        console.log(`----> bot is going to play: ${x} ${y}`);
+        let [roundEnd, roundWinner] = evalMove(x, y);
+        //if the move resulted in a win or a draw
+        if (roundEnd) {
+            renderScore(roundWinner);
+            await renderRoundResult(roundWinner);
+            renderNewRound();
+            //if this is the last round
+            if (game.checkEnd()) {
+                screen.showEndGame(game.getGameWinner());
+                return;
+            }
+        }
+        //switch active player
+        switchActivePlayer();
     };
 
     //event handler
