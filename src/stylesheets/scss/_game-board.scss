@@ -50,6 +50,10 @@
         border-radius: 0px 25px 25px 0px;
         left: -2px;
     }
+
+    &.inactive {
+        display: none;
+    }
 }
 
 .player_title {
@@ -68,6 +72,28 @@
     opacity: 0.05;
     fill: var(--font-color);
     z-index: -1;
+}
+
+.bot_info {
+    @extend .player_info;
+    transition: color 0.5s, background 0.5s;
+
+    .bot_title {
+        font-size: 3rem;
+    }
+    .bot_token {
+        @extend .player_token;
+        transition: fill 0.5s;
+    }
+    &.active {
+        color: var(--background-color);
+        background: var(--font-color);
+        .bot_token {
+            fill: black;
+            opacity: 0.2;
+            z-index: 0;
+        }
+    }
 }
 
 .board {

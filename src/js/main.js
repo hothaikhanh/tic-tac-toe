@@ -99,7 +99,6 @@ function GameController() {
         longestChain.set([]);
         board.setBoard();
     };
-
     const play = (x, y) => {
         board.getBoard()[x][y].setVal(players.getActive().getToken());
     };
@@ -199,10 +198,7 @@ function GameController() {
                 return false;
         }
     };
-    const forfeitRound = (playerID) => {
-        let roundWinner = playerID == 0 ? player2 : player1;
-        players.setActive(roundWinner);
-    };
+
     const resetAll = () => {
         scores.set([]);
         players.setActive(player1);
@@ -214,7 +210,6 @@ function GameController() {
         mode,
         longestChain,
         setNewBoard,
-        forfeitRound,
         play,
         checkLegal,
         checkWin,
@@ -227,14 +222,27 @@ function GameController() {
 }
 function ScreenController() {
     const title = document.querySelector(".title");
+
     const startMenu = document.querySelector(".start-menu");
-    const playerMenu = document.querySelector(".player-menu");
+
+    const multiPlayerMenu = document.querySelector(".player-menu-pvp");
+    const singlePlayerMenu = document.querySelector(".player-menu-pve");
+
     const gameBoard = document.querySelector(".game");
+
+    const playerInfo = document.querySelectorAll(".player_info");
+    const botInfo = document.querySelector(".bot_info");
+
     const nameDisplays = document.querySelectorAll(".player_name");
     const tokenDisplays = document.querySelectorAll(".player_token");
     const titleDisplays = document.querySelectorAll(".player_title");
+
+    const botTitleDisplay = document.querySelector(".bot_title");
+    const botTokenDisplay = document.querySelector(".bot_token");
+
     const scoreBoard = document.querySelectorAll(".score_display");
     const indicators = document.querySelectorAll(".turn-indicator");
+
     const screenBlocker = document.querySelector(".block-overlay");
     const endResult = document.querySelector(".result_container");
     const winResult = document.querySelector(".result--win");
@@ -250,13 +258,21 @@ function ScreenController() {
         transitOut(gameBoard, 500);
         transitIn(startMenu, 500);
     };
-    const showPlayerMenu = () => {
+    const showPlayerMenu = (gameMode) => {
         title.classList.add("center");
         transitOut(startMenu, 500);
-        transitIn(playerMenu, 500);
+        gameMode == "pvp" ? transitIn(multiPlayerMenu, 500) : transitIn(singlePlayerMenu, 500);
     };
-    const showGame = () => {
-        transitOut(playerMenu, 500);
+    const showGame = (gameMode) => {
+        if (gameMode == "pvp") {
+            transitOut(multiPlayerMenu, 500);
+            playerInfo[1].classList.remove("inactive");
+            botInfo.classList.add("inactive");
+        } else {
+            transitOut(singlePlayerMenu, 500);
+            playerInfo[1].classList.add("inactive");
+            botInfo.classList.remove("inactive");
+        }
         transitIn(gameBoard, 500);
         // console.log("...starting the game");
     };
@@ -270,13 +286,27 @@ function ScreenController() {
             transitIn(tieResult, 500);
         }
     };
-    const moveIndicator = () => {
-        if (indicators[0].classList.contains("inactive")) {
-            transitOut(indicators[1], 200);
-            transitIn(indicators[0], 200, 100);
-        } else {
-            transitOut(indicators[0], 200);
-            transitIn(indicators[1], 200, 100);
+    const moveIndicator = (gameMode) => {
+        if (gameMode == "pvp") {
+            if (indicators[0].classList.contains("inactive")) {
+                transitOut(indicators[1], 200);
+                transitIn(indicators[0], 200, 100);
+            } else {
+                transitOut(indicators[0], 200);
+                transitIn(indicators[1], 200, 100);
+            }
+        }
+
+        if (gameMode == "pve") {
+            console.log("good so far");
+
+            if (indicators[0].classList.contains("inactive")) {
+                transitIn(indicators[0], 200, 100);
+                botInfo.classList.remove("active");
+            } else {
+                transitOut(indicators[0], 200);
+                botInfo.classList.add("active");
+            }
         }
     };
 
@@ -285,20 +315,29 @@ function ScreenController() {
         switch (currentGameMode) {
             case "pvp":
                 titleDisplays[0].innerText = "PLAYER ONE";
+                nameDisplays[0].innerText = players[0].getName();
+                tokenDisplays[0].innerText = "";
+                tokenDisplays[0].appendChild(getIcon(players[0].getToken()));
+
                 titleDisplays[1].innerText = "PLAYER TWO";
+                nameDisplays[1].innerText = players[1].getName();
+                tokenDisplays[1].innerText = "";
+                tokenDisplays[1].appendChild(getIcon(players[1].getToken()));
+
                 break;
             case "pve":
-                titleDisplays[0].innerText = "PLAYER";
-                titleDisplays[1].innerText = "BOT";
+                titleDisplays[0].innerText = "PLAYER ";
+                nameDisplays[0].innerText = players[0].getName();
+                tokenDisplays[0].innerText = "";
+                tokenDisplays[0].appendChild(getIcon(players[0].getToken()));
+
+                botTitleDisplay.innerText = "BOT";
+                botTokenDisplay.innerText = "";
+                botTokenDisplay.appendChild(getIcon(players[1].getToken()));
+
                 break;
         }
         //set the text for the player's info
-        nameDisplays[0].innerText = players[0].getName();
-        nameDisplays[1].innerText = players[1].getName();
-        tokenDisplays[0].innerText = "";
-        tokenDisplays[0].appendChild(getIcon(players[0].getToken().nodeValue));
-        tokenDisplays[1].innerText = "";
-        tokenDisplays[1].appendChild(getIcon(players[1].getToken().nodeValue));
     };
 
     const showRoundTie = (duration) => {
@@ -327,13 +366,13 @@ function ScreenController() {
         for (let x = 0; x < rows; ++x) {
             for (let y = 0; y < cols; ++y) {
                 getCells(x, y).innerText = "";
-                if (board[x][y].getVal() !== "") getCells(x, y).appendChild(getIcon(board[x][y].getVal().nodeValue));
+                if (board[x][y].getVal() !== "") getCells(x, y).appendChild(getIcon(board[x][y].getVal()));
             }
         }
     };
     const updateScore = (currentScores) => {
         let lastestRound = currentScores.length - 1;
-        let iconValue = currentScores[lastestRound] == "" ? "draw" : currentScores[lastestRound].nodeValue;
+        let iconValue = currentScores[lastestRound] == "" ? "draw" : currentScores[lastestRound];
         scoreBoard[lastestRound].appendChild(getIcon(iconValue));
     };
 
@@ -356,9 +395,11 @@ function ScreenController() {
             transitOut(endResult, 500);
         }
 
-        //reset player's turn indicator
+        //reset pvp turn indicator
         indicators[0].classList.remove("inactive");
         indicators[1].classList.add("inactive");
+        //reset pvp turn indicator
+        botInfo.classList.remove("active");
     };
     const blockScreen = (duration) => {
         screenBlocker.classList.add("active");
@@ -384,9 +425,6 @@ function ScreenController() {
 }
 
 function BotController(game) {
-    const rows = ROW;
-    const cols = COL;
-
     let humanTokenID = "";
     let botTokenID = "";
     let emptyCells = {};
@@ -674,12 +712,21 @@ const getIcon = (tokenID) => {
                 "M153.6 29.9l16-21.3C173.6 3.2 180 0 186.7 0C198.4 0 208 9.6 208 21.3V43.5c0 13.1 5.4 25.7 14.9 34.7L307.6 159C356.4 205.6 384 270.2 384 337.7C384 434 306 512 209.7 512H192C86 512 0 426 0 320v-3.8c0-48.8 19.4-95.6 53.9-130.1l3.5-3.5c4.2-4.2 10-6.6 16-6.6C85.9 176 96 186.1 96 198.6V288c0 35.3 28.7 64 64 64s64-28.7 64-64v-3.9c0-18-7.2-35.3-19.9-48l-38.6-38.6c-24-24-37.5-56.7-37.5-90.7c0-27.7 9-54.8 25.6-76.9z"
             );
             break;
+
+        case "bot":
+            svg.setAttribute("viewBox", "0 0 640 512");
+            path.setAttribute(
+                "d",
+                "M320 0c17.7 0 32 14.3 32 32V96H472c39.8 0 72 32.2 72 72V440c0 39.8-32.2 72-72 72H168c-39.8 0-72-32.2-72-72V168c0-39.8 32.2-72 72-72H288V32c0-17.7 14.3-32 32-32zM208 384c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H208zm96 0c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H304zm96 0c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H400zM264 256a40 40 0 1 0 -80 0 40 40 0 1 0 80 0zm152 40a40 40 0 1 0 0-80 40 40 0 1 0 0 80zM48 224H64V416H48c-26.5 0-48-21.5-48-48V272c0-26.5 21.5-48 48-48zm544 0c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H576V224h16z"
+            );
+            break;
         case "draw":
             svg.setAttribute("viewBox", "0 0 448 512");
             path.setAttribute(
                 "d",
                 "M48 128c-17.7 0-32 14.3-32 32s14.3 32 32 32H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H48zm0 192c-17.7 0-32 14.3-32 32s14.3 32 32 32H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H48z"
             );
+            break;
     }
     svg.appendChild(path);
     return svg;
@@ -747,8 +794,9 @@ function app() {
     };
     const switchActivePlayer = () => {
         game.players.switchActive();
-        screen.moveIndicator();
+        screen.moveIndicator(game.mode.get());
         //if p2 turn and pve, play bot
+
         if (game.mode.get() == "pve" && game.players.getActive() !== game.players.getAll()[0]) {
             console.log("BOT TURN:");
             botPlay();
@@ -782,26 +830,27 @@ function app() {
         const gameModeOpts = document.querySelectorAll(".start-menu > button");
         gameModeOpts[0].addEventListener("click", (e) => {
             game.mode.set("pve");
-            screen.showPlayerMenu();
+            screen.showPlayerMenu(game.mode.get());
         });
 
         gameModeOpts[1].addEventListener("click", (e) => {
             game.mode.set("pvp");
-            screen.showPlayerMenu();
+            screen.showPlayerMenu(game.mode.get());
         });
     };
     const playerMenuHandler = () => {
-        const submitBtn = document.querySelector("#multiPlayerSubmit");
-        submitBtn.addEventListener("click", () => {
+        const pvpSubmitBtn = document.querySelector("#multiPlayerSubmit");
+        const pveSubmitBtn = document.querySelector("#singlePlayerSubmit");
+        const nameAlert = "Plese enter your name";
+        const tokenAlert = "Plese pick your player icon";
+
+        pvpSubmitBtn.addEventListener("click", () => {
             const submitCondition = [true, true];
             for (let i = 0; i < game.players.getAll().length; i++) {
-                let nameValue = document.querySelectorAll(".name_input")[i].value;
-                let selectedToken = document.querySelector('input[playerID="' + i + '"]:checked');
-                let alertContainer = document.querySelectorAll(".player-menu .alert")[i];
-                let tokenValue = selectedToken ? selectedToken.attributes.tokenID : "";
-
-                let nameAlert = "Plese enter your name";
-                let tokenAlert = "Plese pick your player icon";
+                let nameValue = document.querySelectorAll(".player-menu-pvp .name_input")[i].value;
+                let selectedToken = document.querySelector('.player-menu-pvp input[playerID="' + i + '"]:checked');
+                let alertContainer = document.querySelectorAll(".player-menu-pvp .alert")[i];
+                let tokenValue = selectedToken ? selectedToken.attributes.tokenID.value : "";
 
                 if (nameValue == "") {
                     alertContainer.children[0].innerText = nameAlert;
@@ -820,19 +869,44 @@ function app() {
                 submitCondition[i] = nameValue !== "" && tokenValue !== "";
             }
 
-            //IF PVP, check if the submit conditions from both player's form are met
-            if (game.mode.get() == "pvp" && submitCondition[0] == true && submitCondition[1] == true) {
+            //if the submit conditions from both player's form are met
+            if (submitCondition[0] == true && submitCondition[1] == true) {
                 screen.setPlayerInfo(game.mode.get(), game.players.getAll());
                 renderNewRound();
-                screen.showGame();
+                screen.showGame(game.mode.get());
+            }
+        });
+
+        pveSubmitBtn.addEventListener("click", () => {
+            let nameValue = document.querySelector(".player-menu-pve .name_input").value;
+            let selectedToken = document.querySelector(".player-menu-pve input:checked");
+            let alertContainer = document.querySelector(".player-menu-pve .alert");
+            let tokenValue = selectedToken ? selectedToken.attributes.tokenID.value : "";
+
+            //asign default name and token value for Bot
+            game.players.getAll()[1].setToken("bot");
+            game.players.getAll()[1].setName("BOT");
+
+            //check if the player has entered enough data
+            if (nameValue == "") {
+                alertContainer.children[0].innerText = nameAlert;
+            } else {
+                alertContainer.children[0].innerText = "";
+                game.players.getAll()[0].setName(nameValue);
             }
 
-            //IF PVE, check if the submit conditions from both player's form are met
-            if (game.mode.get() == "pve" && submitCondition[0] == true) {
-                screen.setPlayerInfo(game.mode.get(), game.players.getAll()); //temp
+            if (tokenValue == "") {
+                alertContainer.children[1].innerText = tokenAlert;
+            } else {
+                alertContainer.children[1].innerText = "";
+                game.players.getAll()[0].setToken(tokenValue);
+            }
 
+            //if the submit conditions from player's form are met
+            if (nameValue !== "" && tokenValue !== "") {
+                screen.setPlayerInfo(game.mode.get(), game.players.getAll());
                 renderNewRound();
-                screen.showGame();
+                screen.showGame(game.mode.get());
             }
         });
     };
@@ -841,14 +915,16 @@ function app() {
         const ffBtns = document.querySelectorAll(".ff");
         for (let playerID = 0; playerID < ffBtns.length; playerID++) {
             ffBtns[playerID].addEventListener("click", () => {
-                game.forfeitRound(playerID);
-                renderScore(game.players.getActive().getToken());
+                let winner = playerID == 0 ? game.players.getAll()[1] : game.players.getAll()[0];
+                renderScore(winner.getToken());
+
                 screen.blockScreen(1000);
                 renderNewRound();
                 if (game.checkEnd()) {
                     screen.showEndGame(game.getGameWinner());
                     return;
                 }
+
                 switchActivePlayer();
             });
         }
