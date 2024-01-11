@@ -20,12 +20,11 @@ input[type="text"]:focus {
 html,
 body {
     width: 100%;
-    min-width: 1300px;
     height: 100%;
-    min-height: 700px;
     font-family: "VT323", monospace;
     position: relative;
     color: var(--font-color);
+    overflow: hidden;
 }
 
 button {

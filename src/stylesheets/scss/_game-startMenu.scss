@@ -5,8 +5,7 @@
     justify-content: center;
 
     position: absolute;
-    top: 60%;
-
+    top: calc(40vh + 10vw);
     &.moveIn {
         animation: fadeIn var(--animation-duration) forwards ease-in;
     }
@@ -19,7 +18,7 @@
 }
 
 .start-menu button {
-    font-size: 2.5rem;
+    font-size: clamp(2rem, 1rem + 2vw, 3rem);
     cursor: pointer;
     display: block;
     background-color: inherit;
@@ -40,3 +39,9 @@
         display: none;
     }
 }
+
+// @media (max-width: 370px) {
+//     .start-menu {
+//         top: 50vh;
+//     }
+// }

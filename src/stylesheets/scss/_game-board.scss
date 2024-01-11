@@ -3,16 +3,15 @@
 
 .game {
     @include blur_effect;
+    @include animated_tab;
 
     position: absolute;
     display: flex;
 
     justify-content: center;
     align-items: center;
-    width: 100%;
-    min-width: 1300px;
-    height: 100%;
-    min-height: 700px;
+    width: clamp(320px, 100%, 1300px);
+    height: clamp(700px, 100%, 100%);
 
     &.moveIn {
         animation: floatIn var(--animation-duration) forwards ease-in-out;
@@ -76,14 +75,14 @@
 
 .bot_info {
     @extend .player_info;
-    transition: color 0.5s, background 0.5s;
+    transition: color var(--animation-duration), background var(--animation-duration);
 
     .bot_title {
         font-size: 3rem;
     }
     .bot_token {
         @extend .player_token;
-        transition: fill 0.5s;
+        transition: fill var(--animation-duration);
     }
     &.active {
         color: var(--background-color);
@@ -98,8 +97,9 @@
 
 .board {
     @include glass_effect;
+    @include blur_effect;
     position: relative;
-    height: clamp(700px, 90%, 900px);
+    height: clamp(300px, 90%, 900px);
     z-index: 10;
     border-radius: 2rem;
     z-index: 10;
@@ -107,13 +107,14 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 100px;
+    padding: 5vw;
+    max-height: 90%;
 }
 
 .score {
     position: absolute;
     top: 20px;
-    width: clamp(50%, 50%, 550px);
+    width: clamp(300px, 50%, 550px);
     display: flex;
     gap: 20px;
     justify-content: center;
@@ -122,23 +123,24 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    padding: clamp(0px, 1vw, 10px);
     color: var(--font-color);
     fill: var(--font-color);
 
-    font-size: 2rem;
+    font-size: clamp(1rem, 1vw + 1rem, 2rem);
     font-family: "VT323", monospace;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 3rem;
+    height: 3rem;
+
+    &::before {
+        position: absolute;
+        font-size: clamp(1.5rem, 1rem + 1vw, 2.5rem);
+        content: "<  >";
+        opacity: 0.2;
+        display: block;
+    }
 }
 
-.score_display::before {
-    position: absolute;
-    font-size: 2.5rem;
-    content: "<  >";
-    opacity: 0.2;
-    display: block;
-}
 .reset {
     position: absolute;
     bottom: 20px;
@@ -231,10 +233,13 @@
     height: 100%;
     aspect-ratio: 1/1;
     box-sizing: border-box;
+    width: clamp(250px, 40vw, 600px);
 
     display: grid;
-    grid-template-columns: repeat(3, minmax(150px, 1fr));
-    grid-template-rows: repeat(3, minmax(150px, 1fr));
+
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0px;
+    align-content: center;
 }
 
 .cell {
@@ -244,10 +249,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 50px;
-
+    padding: 2vw;
+    aspect-ratio: 1/1;
     &.highlight {
         animation: cell 1s forwards;
+    }
+    svg {
+        aspect-ratio: 1/1;
     }
 }
 
@@ -261,4 +269,80 @@
 
 .token {
     font-size: 13rem;
+}
+
+@media (max-width: 900px) {
+    .game {
+        flex-direction: column;
+    }
+
+    .player_info {
+        &.left {
+            border-radius: 25px 25px 0px 0px;
+            bottom: -40px;
+        }
+
+        &.right {
+            border-radius: 0px 0px 25px 25px;
+            top: -40px;
+        }
+    }
+
+    .player_name {
+        font-size: 2rem;
+    }
+
+    .ff {
+        width: 100%;
+        height: 100%;
+
+        font-size: 2rem;
+    }
+
+    .left .ff {
+        border-radius: 25px 25px 0px 0px;
+    }
+
+    .right .ff {
+        border-radius: 0px 0px 25px 25px;
+    }
+
+    .board {
+        max-height: 55%;
+    }
+
+    .score {
+        top: 5px;
+        gap: 0px;
+        .score_display {
+            padding: 10px;
+            &::before {
+                font-size: 2rem;
+            }
+        }
+    }
+
+    .left .turn-indicator {
+        top: 20%;
+        left: -10%;
+        transform: rotate(-90deg);
+        &.moveIn {
+            animation: fadeIn var(--animation-duration) ease-out forwards;
+        }
+        &.moveOut {
+            animation: fadeOut var(--animation-duration) ease-in forwards;
+        }
+    }
+
+    .right .turn-indicator {
+        top: 35%;
+        right: -10%;
+        transform: rotate(90deg);
+        &.moveIn {
+            animation: fadeIn var(--animation-duration) ease-out forwards;
+        }
+        &.moveOut {
+            animation: fadeOut var(--animation-duration) ease-in forwards;
+        }
+    }
 }

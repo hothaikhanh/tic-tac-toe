@@ -1,21 +1,21 @@
 @keyframes floatIn {
     0% {
-        transform: translateY(300px);
+        transform: translateY(calc(var(--original-height) + 300px));
         opacity: 0;
     }
     100% {
-        transform: translateY(0px);
+        // transform: translateY(var(--original-height));
         opacity: 1;
     }
 }
 
 @keyframes floatOut {
     0% {
-        transform: translateY(0px);
+        transform: translateY(var(--original-height));
         opacity: 1;
     }
     100% {
-        transform: translateY(300px);
+        transform: translateY(cacl(var(--original-height) - 300px));
         opacity: 0;
     }
 }

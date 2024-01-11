@@ -8,3 +8,9 @@
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
 }
+
+@mixin animated_tab {
+    --original-height: -50%;
+    top: 50%;
+    transform: translateY(var(--original-height));
+}
