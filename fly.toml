@@ -1,0 +1,25 @@
+# fly.toml app configuration file generated for hothaikhanh-tic-tac-toe-app on 2024-01-11T22:59:04+07:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "hothaikhanh-tic-tac-toe-app"
+primary_region = "sin"
+
+[build]
+
+[env]
+  HOSTNAME = "0.0.0.0"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 1024

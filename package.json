@@ -4,6 +4,7 @@
     "sass": "^1.69.5"
   },
   "devDependencies": {
+    "@flydotio/dockerfile": "^0.5.0",
     "nodemon": "^3.0.2"
   },
   "name": "tic-tac-toe",

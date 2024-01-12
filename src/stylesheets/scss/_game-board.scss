@@ -98,23 +98,22 @@
 .board {
     @include glass_effect;
     @include blur_effect;
-    position: relative;
-    height: clamp(300px, 90%, 900px);
-    z-index: 10;
-    border-radius: 2rem;
-    z-index: 10;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 5vw;
+    width: clamp(320px, 50vw, 900px);
+
     max-height: 90%;
+    aspect-ratio: 4/3;
+    padding: 0 clamp(calc(320px / 6), calc(50vw / 6), calc(900px / 6));
+    z-index: 10;
+    border-radius: 2rem;
 }
 
 .score {
-    position: absolute;
-    top: 20px;
-    width: clamp(300px, 50%, 550px);
+    margin-top: 20px;
+    width: clamp(300px, 70%, 550px);
     display: flex;
     gap: 20px;
     justify-content: center;
@@ -142,8 +141,7 @@
 }
 
 .reset {
-    position: absolute;
-    bottom: 20px;
+    margin-bottom: 20px;
     font-size: 1.5rem;
     opacity: 0.3;
     cursor: pointer;
@@ -233,12 +231,9 @@
     height: 100%;
     aspect-ratio: 1/1;
     box-sizing: border-box;
-    width: clamp(250px, 40vw, 600px);
-
+    width: min(100%, 60vh);
     display: grid;
-
     grid-template-columns: repeat(3, 1fr);
-    gap: 0px;
     align-content: center;
 }
 
@@ -257,14 +252,31 @@
     svg {
         aspect-ratio: 1/1;
     }
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.line-top {
-    border-top: 2px solid rgba(255, 255, 255, 0.3);
+.cell:nth-child(1),
+.cell:nth-child(2),
+.cell:nth-child(3) {
+    border-top: 1px solid rgba(255, 255, 255, 0);
 }
 
-.line-left {
-    border-left: 2px solid rgba(255, 255, 255, 0.3);
+.cell:nth-child(1),
+.cell:nth-child(4),
+.cell:nth-child(7) {
+    border-left: 1px solid rgba(255, 255, 255, 0);
+}
+
+.cell:nth-child(3),
+.cell:nth-child(6),
+.cell:nth-child(9) {
+    border-right: 1px solid rgba(255, 255, 255, 0);
+}
+
+.cell:nth-child(7),
+.cell:nth-child(8),
+.cell:nth-child(9) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0);
 }
 
 .token {
